@@ -1,0 +1,1970 @@
+/* ============================================================
+   Barbearia do Lirão — Stylesheet
+   Extraído do <style> inline de index.html para uma estrutura
+   de projeto profissional (assets/css/style.css).
+   ============================================================ */
+
+/* ============================================================
+   TOKENS — derivados do design system (design-novo.html)
+   Superfície escura stone-950, easing (0.16,1,0.3,1),
+   labels mono uppercase tracking-widest. Acento: dourado quente.
+   ============================================================ */
+:root {
+    --ink: #0C0A09;              /* stone-950 — superfície principal */
+    --ink-2: #1C1917;            /* stone-900 — superfície elevada   */
+    --ink-3: #17110C;            /* variante quente p/ profundidade de fundo */
+    --cream: #ECE7DF;            /* texto principal                  */
+    --muted: #A8A29E;            /* stone-400 — texto de apoio       */
+    --line: rgba(255, 255, 255, 0.12);
+    --gold: #C9A56B;             /* acento dourado/bege quente       */
+    --gold-soft: #DCC094;        /* hover do acento                  */
+    --bronze: #8C6A4A;           /* metal escovado — detalhes/carimbos */
+    --leather: #2A1B14;          /* couro envelhecido — sombras/bordas quentes */
+    --shadow-warm: rgba(18, 10, 5, 0.6);  /* sombra quente (substitui preto puro) */
+    --photo-filter: grayscale(0.22) sepia(0.17) saturate(1.12) contrast(1.1) brightness(0.9);
+    --photo-filter-hover: grayscale(0.06) sepia(0.12) saturate(1.2) contrast(1.08) brightness(0.96);
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);   /* easing padrão do DS  */
+    --font-display: 'Oswald', sans-serif;
+    --font-accent: 'Cormorant Garamond', serif;
+    --font-body: 'Inter', sans-serif;
+    --font-mono: ui-monospace, Menlo, Consolas, monospace;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+    font-family: var(--font-body);
+    background-color: var(--ink);
+    color: var(--cream);
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+}
+
+::selection { background: var(--gold); color: var(--ink); }
+
+a { text-decoration: none; color: inherit; }
+
+/* ============================================================
+   ATMOSFERA GLOBAL — grain fino + vinheta quente fixos sobre toda
+   a página. É a camada que dá a sensação "física/fotografada" em
+   vez de "layout digital chapado" — sutil o bastante pra nunca
+   chamar atenção sozinha, mas presente em toda a rolagem.
+   ============================================================ */
+.grain-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    pointer-events: none;
+    opacity: 0.05;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScxODAnIGhlaWdodD0nMTgwJz48ZmlsdGVyIGlkPSduJz48ZmVUdXJidWxlbmNlIHR5cGU9J2ZyYWN0YWxOb2lzZScgYmFzZUZyZXF1ZW5jeT0nMC44NScgbnVtT2N0YXZlcz0nMicgc3RpdGNoVGlsZXM9J3N0aXRjaCcvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPScxMDAlJyBoZWlnaHQ9JzEwMCUnIGZpbHRlcj0ndXJsKCNuKScvPjwvc3ZnPg==");
+    background-size: 180px 180px;
+}
+
+.vignette-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9998;
+    pointer-events: none;
+    background: radial-gradient(ellipse at 50% 40%, transparent 45%, rgba(6, 4, 2, 0.5) 100%);
+}
+
+/* "Rebite" dourado nas costuras entre dobras — pequeno detalhe de
+   acabamento metálico/artesanal, como um rebite de couro, marcando
+   cada transição de seção sem precisar de divisórias pesadas. */
+.benefits::before,
+.services::before,
+.gallery::before,
+.team::before,
+.reviews::before,
+.contact::before {
+    content: "";
+    position: absolute;
+    top: -1px;
+    left: 50%;
+    z-index: 2;
+    width: 7px;
+    height: 7px;
+    background: var(--ink);
+    border: 1px solid var(--gold);
+    transform: translate(-50%, -50%) rotate(45deg);
+}
+
+/* Numeral do eyebrow vira um pequeno selo/carimbo (aplica-se a
+   todas as dobras de uma vez, via seletor de atributo — evita
+   repetir a mesma regra em cada bloco __eyebrow). */
+[class*="__eyebrow"] .num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.1rem 0.4rem;
+    border: 1px solid rgba(201, 165, 107, 0.35);
+    border-radius: 2px;
+    background: rgba(0, 0, 0, 0.18);
+    font-size: 0.92em;
+}
+
+/* Leve profundidade "gravada" nos títulos grandes — mesmo recurso
+   em todas as dobras (inclui .hero__title, que também casa com
+   o seletor por conter "__title" no nome da classe). */
+[class*="__title"] {
+    text-shadow: 0 2px 22px rgba(0, 0, 0, 0.35);
+}
+
+/* ============================================================
+   MOTION — vocabulário emprestado literalmente do design-novo.html:
+   glow-orb (drift+morph), beam-btn (anel cônico + shimmer),
+   clip-letters (reveal letra-a-letra), pan-grid (textura viva).
+   ============================================================ */
+@keyframes drift {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(3%, -4%) scale(1.06); }
+    66% { transform: translate(-3%, 3%) scale(0.96); }
+}
+@keyframes morph {
+    0%, 100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+    50% { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; }
+}
+.glow-orb {
+    position: absolute;
+    z-index: 4;
+    filter: blur(70px);
+    animation: drift 16s ease-in-out infinite, morph 12s ease-in-out infinite;
+    pointer-events: none;
+}
+
+@keyframes pan-grid {
+    0% { background-position: 0 0; }
+    100% { background-position: 44px 44px; }
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes shimmer {
+    from { transform: translateX(-120%) skewX(-15deg); }
+    to { transform: translateX(220%) skewX(-15deg); }
+}
+
+@keyframes letter-in {
+    0% { transform: translateY(100%); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+}
+.clip-letters { display: inline-block; }
+.clip-letters span {
+    display: inline-block;
+    transform: translateY(100%);
+    opacity: 0;
+    animation: letter-in 0.7s var(--ease) forwards;
+    animation-play-state: paused;
+}
+.clip-letters.active span { animation-play-state: running; }
+
+:focus-visible {
+    outline: 1px solid var(--gold);
+    outline-offset: 4px;
+    border-radius: 2px;
+}
+
+/* ============================================================
+   NAVBAR — sticky, blur, entrada .nav-load (padrão do DS)
+   ============================================================ */
+.nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+    padding: 1.4rem clamp(1.25rem, 4vw, 3rem);
+    background: rgba(12, 10, 9, 0.55);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--line);
+    /* animação de entrada: translateY(-10px) → 0 */
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.nav.loaded { opacity: 1; transform: translateY(0); }
+
+.nav__logo {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: var(--cream);
+    transition: color 0.25s var(--ease);
+}
+
+.nav__logo em {
+    font-family: var(--font-accent);
+    font-style: italic;
+    text-transform: none;
+    letter-spacing: 0.02em;
+    font-size: 1.15em;
+    color: var(--gold);
+}
+
+.nav__links {
+    display: flex;
+    align-items: center;
+    gap: clamp(1.2rem, 2.5vw, 2.2rem);
+    list-style: none;
+}
+
+.nav__links a {
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding-bottom: 3px;
+    border-bottom: 1px solid transparent;
+    transition: color 0.25s var(--ease), border-color 0.25s var(--ease);
+}
+
+.nav__links a:hover { color: var(--cream); border-color: var(--gold); }
+
+/* CTA outline — espelho da "Ação Secundária" do DS, em dourado */
+.nav__cta {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gold);
+    border: 1px solid rgba(201, 165, 107, 0.55);
+    border-radius: 9999px;
+    padding: 0.7rem 1.5rem;
+    white-space: nowrap;
+    transition: background 0.25s var(--ease), color 0.25s var(--ease), border-color 0.25s var(--ease);
+}
+
+.nav__cta:hover {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: var(--ink);
+}
+
+/* Hambúrguer (mobile) */
+.nav__burger {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    width: 40px; height: 40px;
+    background: none;
+    border: 1px solid var(--line);
+    border-radius: 9999px;
+    cursor: pointer;
+    padding: 0 10px;
+    transition: border-color 0.25s var(--ease);
+}
+
+.nav__burger:hover { border-color: var(--gold); }
+
+.nav__burger span {
+    display: block;
+    height: 1px;
+    background: var(--cream);
+    transition: transform 0.3s var(--ease), opacity 0.3s var(--ease);
+}
+
+.nav__burger[aria-expanded="true"] span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+.nav__burger[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
+.nav__burger[aria-expanded="true"] span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+/* Menu mobile em painel */
+.mobile-menu {
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    background: rgba(12, 10, 9, 0.96);
+    backdrop-filter: blur(10px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 2rem;
+    gap: 0.25rem;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s var(--ease);
+}
+
+.mobile-menu.open { opacity: 1; pointer-events: auto; }
+
+.mobile-menu a {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--cream);
+    padding: 0.9rem 0;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transform: translateY(16px);
+    opacity: 0;
+    transition: transform 0.6s var(--ease), opacity 0.6s var(--ease), color 0.25s var(--ease);
+}
+
+.mobile-menu.open a { transform: translateY(0); opacity: 1; }
+.mobile-menu a:hover { color: var(--gold); }
+.mobile-menu a .idx { font-family: var(--font-mono); font-size: 0.65rem; color: var(--muted); letter-spacing: 0.14em; }
+
+/* stagger do menu mobile */
+.mobile-menu.open a:nth-child(1) { transition-delay: 0.05s; }
+.mobile-menu.open a:nth-child(2) { transition-delay: 0.10s; }
+.mobile-menu.open a:nth-child(3) { transition-delay: 0.15s; }
+.mobile-menu.open a:nth-child(4) { transition-delay: 0.20s; }
+.mobile-menu.open a:nth-child(5) { transition-delay: 0.25s; }
+.mobile-menu.open a:nth-child(6) { transition-delay: 0.30s; }
+
+/* ============================================================
+   HERO — vídeo full-bleed + gradient wash (estrutura do DS)
+   ============================================================ */
+.hero {
+    position: relative;
+    min-height: 100vh;
+    min-height: 100svh;
+    overflow: hidden;
+    display: flex;
+    align-items: flex-end;   /* texto ancorado embaixo à esquerda, como no DS */
+    background: radial-gradient(130% 65% at 50% 0%, var(--ink-3) 0%, var(--ink) 60%);
+}
+
+.hero__video {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* mesma receita de cor de toda a fotografia do site (--photo-filter),
+       pra unificar vídeo + fotos numa só direção de arte */
+    filter: var(--photo-filter);
+    will-change: transform;
+}
+
+/* Grid schematic sutil sobre o vídeo (textura do DS), com pan lento
+   (.animate-pan-grid do DS) para manter a composição "viva" mesmo
+   quando o vídeo está parado num frame durante o scrub. */
+.hero__grid {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    background-image:
+        linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    background-size: 44px 44px;
+    animation: pan-grid 9s linear infinite;
+    mix-blend-mode: overlay;
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+/* Gradient wash para legibilidade — mesmo padrão do hero do DS */
+.hero__wash {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    pointer-events: none;
+    background:
+        linear-gradient(to top, rgba(12, 10, 9, 0.88) 0%, rgba(12, 10, 9, 0.22) 45%, rgba(12, 10, 9, 0.08) 100%),
+        linear-gradient(to right, rgba(12, 10, 9, 0.55) 0%, rgba(12, 10, 9, 0.02) 60%, rgba(12, 10, 9, 0.2) 100%);
+}
+
+/* Spotlight de cursor sobre a hero — adaptação do .flashlight-card
+   do DS (flashlight-card-dark) para toda a cena, não só um card. */
+.hero__spot {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.6s var(--ease);
+    background: radial-gradient(600px circle at var(--mx, 50%) var(--my, 50%), rgba(255, 255, 255, 0.10), transparent 55%);
+}
+
+.hero.spot-active .hero__spot { opacity: 1; }
+
+.hero__content {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 8rem clamp(1.25rem, 5vw, 3.5rem) clamp(4.5rem, 9vh, 7rem);
+    will-change: transform, opacity;
+}
+
+/* --- Tag / eyebrow --- */
+.hero__tag {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2.25rem;
+}
+
+.hero__tag .rule {
+    width: 3.5rem;
+    height: 1px;
+    background: var(--gold);
+    transform-origin: left;
+    /* traço "se desenha" da esquerda pra direita ao revelar */
+    transform: scaleX(0);
+    transition: transform 1s var(--ease) 0.5s;
+}
+
+.is-revealed .hero__tag .rule { transform: scaleX(1); }
+
+.hero__tag span {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--gold);
+}
+
+/* --- Headline com masked reveal (padrão .text-reveal do DS) --- */
+.hero__title {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(2.9rem, 8.2vw, 7.2rem);
+    line-height: 0.98;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+    color: var(--cream);
+    margin-bottom: 2rem;
+    max-width: 14ch;
+}
+
+.hero__title em {
+    font-family: var(--font-accent);
+    font-style: italic;
+    font-weight: 500;
+    text-transform: none;
+    letter-spacing: 0;
+    font-size: 1.12em;
+    line-height: 0.8;
+    color: var(--gold);
+}
+
+.reveal-line {
+    display: block;
+    overflow: hidden;   /* máscara */
+}
+
+.reveal-line > span {
+    display: block;
+    transform: translateY(110%);
+    opacity: 0;
+    transition: transform 1.2s var(--ease), opacity 1.2s ease;
+}
+
+.is-revealed .reveal-line > span { transform: translateY(0); opacity: 1; }
+
+/* --- Subheadline --- */
+.hero__sub {
+    max-width: 34rem;
+    font-size: clamp(0.9rem, 1.1vw, 1rem);
+    line-height: 1.75;
+    color: var(--muted);
+    margin-bottom: 3rem;
+}
+
+/* --- Reveal simples (fade + rise), do catálogo de motion do DS --- */
+.reveal {
+    opacity: 0;
+    transform: translateY(2rem);
+    transition: opacity 1s var(--ease), transform 1s var(--ease);
+}
+
+.is-revealed .reveal { opacity: 1; transform: translateY(0); }
+
+.delay-200 { transition-delay: 0.2s; }
+.delay-400 { transition-delay: 0.4s; }
+.delay-600 { transition-delay: 0.6s; }
+.delay-800 { transition-delay: 0.8s; }
+
+/* --- Botões --- */
+.hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 2.25rem;
+}
+
+/* --- Beam button (anel cônico rotativo + shimmer no hover) ---
+   Estrutura e mecânica idênticas ao .beam-btn do DS: um anel
+   conic-gradient girando atrás de uma face sólida, revelado só
+   na frestinha de 1px, mais um sweep diagonal que passa no hover.
+   Aqui a face é dourada (CTA principal) e o anel em tom creme,
+   criando um glint rotativo sutil na borda — acabamento "joia". */
+.beam-btn {
+    position: relative;
+    display: inline-flex;
+    border-radius: 9999px;
+    padding: 1px;
+    overflow: hidden;
+    color: rgba(236, 231, 223, 0.85);
+}
+
+.beam-btn .beam-ring {
+    position: absolute;
+    inset: -1000%;
+    animation: spin 2.6s linear infinite;
+    background: conic-gradient(from 0deg, transparent 0 340deg, currentColor 360deg);
+}
+
+.beam-btn .beam-face {
+    position: relative;
+    z-index: 10;
+    display: inline-flex;
+    align-items: center;
+    overflow: hidden;
+    border-radius: 9999px;
+    background: var(--gold);
+    color: var(--ink);
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    padding: 1.05rem 2.2rem;
+    /* brilho quente permanente e discreto — o CTA principal já nasce
+       "iluminado", como uma peça valiosa numa vitrine, mesmo em repouso */
+    box-shadow: 0 10px 28px -14px rgba(201, 165, 107, 0.4);
+    transition: background 0.25s var(--ease), transform 0.25s var(--ease), box-shadow 0.25s var(--ease);
+}
+
+.beam-btn .beam-label {
+    position: relative;
+    z-index: 10;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.beam-btn .beam-sweep { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.beam-btn .beam-sweep span {
+    position: absolute; top: 0; left: 0; height: 100%; width: 100%;
+    transform: skewX(-15deg);
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.55), transparent);
+    opacity: 0;
+}
+
+.beam-btn .arrow { transition: transform 0.25s var(--ease); }
+
+.beam-btn:hover .beam-face {
+    background: var(--gold-soft);
+    transform: translateY(-2px);
+    box-shadow: 0 14px 34px -12px rgba(201, 165, 107, 0.45);
+}
+
+.beam-btn:hover .arrow { transform: translateX(4px); }
+.beam-btn:active .beam-face { transform: translateY(0) scale(0.97); }
+.beam-btn:hover .beam-sweep span { opacity: 1; animation: shimmer 1.3s infinite; }
+
+.btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--cream);
+    padding-bottom: 4px;
+    border-bottom: 1px solid rgba(236, 231, 223, 0.35);
+    transition: color 0.25s var(--ease), border-color 0.25s var(--ease), transform 0.2s var(--ease);
+}
+
+.btn-ghost .arrow { transition: transform 0.25s var(--ease); }
+.btn-ghost:hover { color: var(--gold); border-color: var(--gold); }
+.btn-ghost:hover .arrow { transform: translateX(4px); }
+
+/* Outline pill — "Ação Secundária" do DS (border + fill-on-hover) */
+.btn-outline {
+    display: inline-flex;
+    align-items: center;
+    align-self: flex-start;
+    gap: 0.6rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--cream);
+    border: 1px solid rgba(236, 231, 223, 0.35);
+    border-radius: 9999px;
+    padding: 0.95rem 2rem;
+    transition: background 0.25s var(--ease), color 0.25s var(--ease), border-color 0.25s var(--ease), transform 0.2s var(--ease);
+}
+
+.btn-outline .arrow { transition: transform 0.25s var(--ease); }
+.btn-outline:hover { background: var(--cream); color: var(--ink); border-color: var(--cream); }
+.btn-outline:hover .arrow { transform: translateX(4px); }
+.btn-outline:active,
+.btn-ghost:active { transform: scale(0.97); }
+
+/* ============================================================
+   DOBRA 2 — "NOSSO OFÍCIO" (benefícios)
+   Split editorial: fotografia real dominante de um lado, texto
+   persuasivo do outro — mesma composição estrutural da referência
+   (ambiente cheio de caráter + uma placa/sinalização como detalhe
+   que "pendura" sobre a imagem, ecoando a placa "Stay Sharp").
+   ============================================================ */
+.benefits {
+    position: relative;
+    background: radial-gradient(130% 65% at 50% 0%, var(--ink-3) 0%, var(--ink) 60%);
+    border-top: 1px solid var(--line);
+    padding: clamp(5rem, 11vh, 8.5rem) 0;
+    overflow: hidden;
+    scroll-margin-top: 90px;
+}
+
+.benefits__inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 clamp(1.25rem, 5vw, 3.5rem);
+    display: grid;
+    grid-template-columns: 1.05fr 1fr;
+    gap: clamp(3rem, 6vw, 6rem);
+    align-items: center;
+}
+
+.benefits__media { position: relative; }
+
+/* Moldura contém o zoom da foto (overflow:hidden) sem cortar a
+   placa, que precisa "vazar" para fora da moldura por baixo. */
+.benefits__frame {
+    overflow: hidden;
+    border: 1px solid var(--line);
+}
+
+.benefits__img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 5 / 7;
+    object-fit: cover;
+    filter: var(--photo-filter);
+    transform: scale(1);
+    transition: transform 1.4s var(--ease), filter 0.6s var(--ease);
+}
+
+.benefits__media:hover .benefits__img { transform: scale(1.045); filter: var(--photo-filter-hover); }
+
+/* Placa pendurada no canto — eco direto da placa "Stay Sharp"
+   da imagem de referência, como detalhe estrutural da composição.
+   Nasce mais girada e alta, e "assenta" no lugar com um leve atraso
+   em relação à foto — como se estivesse sendo pendurada agora. */
+.benefits__badge {
+    position: absolute;
+    right: -0.75rem;
+    bottom: -1.5rem;
+    z-index: 2;
+    background: var(--ink-2);
+    border: 1px solid rgba(201, 165, 107, 0.5);
+    padding: 1rem 1.6rem;
+    text-align: center;
+    box-shadow: 0 24px 44px -18px var(--shadow-warm);
+    opacity: 0;
+    transform: rotate(-11deg) translateY(-16px);
+    transition: opacity 0.9s var(--ease) 0.55s, transform 0.9s var(--ease) 0.55s;
+}
+
+.is-revealed .benefits__badge { opacity: 1; transform: rotate(-3deg) translateY(0); }
+
+.benefits__badge-top {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    white-space: nowrap;
+}
+
+.benefits__badge-bottom {
+    display: block;
+    font-family: var(--font-accent);
+    font-style: italic;
+    font-weight: 500;
+    font-size: 1.7rem;
+    line-height: 1;
+    color: var(--gold);
+    margin-top: 0.35rem;
+}
+
+.benefits__content { display: flex; flex-direction: column; }
+
+.benefits__eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.75rem;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--gold);
+}
+
+.benefits__eyebrow .num { color: var(--muted); }
+.benefits__eyebrow .rule { width: 2.5rem; height: 1px; background: var(--gold); }
+
+.benefits__title {
+    font-family: var(--font-display);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: clamp(2.3rem, 4.6vw, 3.9rem);
+    line-height: 1.02;
+    letter-spacing: -0.015em;
+    color: var(--cream);
+    margin-bottom: 1.5rem;
+}
+
+.benefits__title em {
+    font-family: var(--font-accent);
+    font-style: italic;
+    font-weight: 500;
+    text-transform: none;
+    color: var(--gold);
+}
+
+.benefits__lede {
+    max-width: 32rem;
+    font-size: 1rem;
+    line-height: 1.75;
+    color: var(--muted);
+    margin-bottom: 2.75rem;
+}
+
+.benefits__list {
+    list-style: none;
+    border-top: 1px solid var(--line);
+    margin-bottom: 2.75rem;
+}
+
+.benefits__item {
+    position: relative;
+    display: flex;
+    gap: 1.5rem;
+    padding: 1.5rem 0;
+    border-bottom: 1px solid var(--line);
+    transition: padding-left 0.35s var(--ease);
+}
+
+.benefits__item:hover { padding-left: 0.4rem; }
+
+/* Linha de precisão — traço dourado que "corta" verticalmente ao
+   hover, no vão à esquerda do texto (motivo: precisão de navalha). */
+.benefits__item::before {
+    content: "";
+    position: absolute;
+    left: -1.25rem;
+    top: 0.35rem;
+    bottom: 0.35rem;
+    width: 2px;
+    background: var(--gold);
+    transform: scaleY(0);
+    transform-origin: top;
+    transition: transform 0.4s var(--ease);
+}
+
+.benefits__item:hover::before { transform: scaleY(1); }
+
+.benefits__item-num {
+    flex-shrink: 0;
+    width: 1.6rem;
+    padding-top: 0.15rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--gold);
+    transition: color 0.35s var(--ease);
+}
+
+.benefits__item:hover .benefits__item-num { color: var(--gold-soft); }
+
+.benefits__item-body h3 {
+    font-family: var(--font-body);
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--cream);
+    margin-bottom: 0.4rem;
+}
+
+.benefits__item-body p {
+    max-width: 30rem;
+    font-size: 0.875rem;
+    line-height: 1.65;
+    color: var(--muted);
+}
+
+@media (max-width: 900px) {
+    .benefits__inner { grid-template-columns: 1fr; gap: 3.5rem; }
+    .benefits__media { max-width: 26rem; margin: 0 auto; }
+}
+
+@media (max-width: 480px) {
+    .benefits__badge { right: 0.6rem; bottom: -1.15rem; padding: 0.8rem 1.15rem; }
+    .benefits__badge-bottom { font-size: 1.5rem; }
+    .benefits__item { gap: 1rem; }
+}
+
+/* ============================================================
+   DOBRA 3 — "NOSSOS SERVIÇOS" (grid de serviços + preços)
+   4 cards com fotografia real no topo (crop uniforme 4:5 + filtro
+   unificador de cor, já que as 4 fotos vêm de fontes/tons distintos)
+   e corpo sólido embaixo — preço sempre em destaque e legível.
+   ============================================================ */
+.services {
+    position: relative;
+    background: radial-gradient(130% 65% at 50% 0%, var(--ink-3) 0%, var(--ink) 60%);
+    border-top: 1px solid var(--line);
+    padding: clamp(5rem, 11vh, 8.5rem) 0;
+    scroll-margin-top: 90px;
+}
+
+.services__inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 clamp(1.25rem, 5vw, 3.5rem);
+}
+
+.services__header { max-width: 40rem; margin-bottom: clamp(3rem, 6vw, 4.5rem); }
+
+.services__eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.75rem;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--gold);
+}
+
+.services__eyebrow .num { color: var(--muted); }
+.services__eyebrow .rule { width: 2.5rem; height: 1px; background: var(--gold); }
+
+.services__title {
+    font-family: var(--font-display);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: clamp(2.3rem, 4.6vw, 3.6rem);
+    line-height: 1.03;
+    letter-spacing: -0.015em;
+    color: var(--cream);
+    margin-bottom: 1.1rem;
+}
+
+.services__title em {
+    font-family: var(--font-accent);
+    font-style: italic;
+    font-weight: 500;
+    text-transform: none;
+    color: var(--gold);
+}
+
+.services__subtitle {
+    max-width: 30rem;
+    font-size: 1rem;
+    line-height: 1.7;
+    color: var(--muted);
+}
+
+.services__grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: clamp(1.5rem, 2.2vw, 1.85rem);
+}
+
+.service-card {
+    display: flex;
+    flex-direction: column;
+    background: var(--ink-2);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    overflow: hidden;
+    transition: transform 0.4s var(--ease), border-color 0.4s var(--ease), box-shadow 0.4s var(--ease);
+}
+
+.service-card:hover {
+    transform: translateY(-6px);
+    border-color: rgba(201, 165, 107, 0.4);
+    box-shadow: 0 26px 50px -22px var(--shadow-warm);
+}
+
+.service-card__frame {
+    position: relative;
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+}
+
+.service-card__img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* --photo-filter unificado (ver :root) — as 4 fotos vêm de
+       fontes/tons diferentes; isso as aproxima da mesma paleta */
+    filter: var(--photo-filter);
+    transform: scale(1);
+    transition: transform 1.1s var(--ease), filter 0.6s var(--ease);
+}
+
+.service-card:hover .service-card__img { transform: scale(1.06); filter: var(--photo-filter-hover); }
+
+.service-card__tint {
+    position: absolute;
+    inset: 0;
+    background: rgba(20, 14, 8, 0.35);
+    mix-blend-mode: multiply;
+    pointer-events: none;
+}
+
+.service-card__body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding: 1.5rem 1.5rem 1.75rem;
+}
+
+.service-card__name {
+    font-family: var(--font-body);
+    font-size: 1.02rem;
+    font-weight: 600;
+    color: var(--cream);
+    margin-bottom: 0.7rem;
+}
+
+.service-card__meta {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-bottom: 0.9rem;
+    padding-bottom: 0.9rem;
+    border-bottom: 1px solid var(--line);
+}
+
+.service-card__price {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.55rem;
+    letter-spacing: -0.01em;
+    color: var(--gold);
+}
+
+.service-card__duration {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    white-space: nowrap;
+}
+
+.service-card__tagline {
+    font-size: 0.85rem;
+    line-height: 1.6;
+    color: var(--muted);
+    margin-bottom: 1.4rem;
+    flex: 1;
+}
+
+.service-card__cta {
+    display: inline-flex;
+    align-items: center;
+    align-self: flex-start;
+    gap: 0.5rem;
+    font-size: 0.74rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--cream);
+    padding-bottom: 3px;
+    border-bottom: 1px solid rgba(236, 231, 223, 0.35);
+    transition: color 0.25s var(--ease), border-color 0.25s var(--ease);
+}
+
+.service-card__cta .arrow { transition: transform 0.25s var(--ease); }
+.service-card__cta:hover { color: var(--gold); border-color: var(--gold); }
+.service-card__cta:hover .arrow { transform: translateX(4px); }
+
+.services__cta-wrap {
+    display: flex;
+    justify-content: center;
+    margin-top: clamp(3rem, 6vw, 4rem);
+}
+
+@media (max-width: 1100px) {
+    .services__grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 600px) {
+    .services__grid { grid-template-columns: 1fr; }
+}
+
+/* ============================================================
+   DOBRA 4 — "GALERIA" (mosaico editorial)
+   Grid assimétrico (grid-auto-flow:dense) com variação real de
+   proporção — uma foto dominante, uma vertical de detalhe, uma
+   faixa horizontal de momento, e duas menores — em vez do grid
+   genérico de quadrados iguais.
+   ============================================================ */
+.gallery {
+    position: relative;
+    background: radial-gradient(130% 65% at 50% 0%, var(--ink-3) 0%, var(--ink) 60%);
+    border-top: 1px solid var(--line);
+    padding: clamp(5rem, 11vh, 8.5rem) 0;
+    scroll-margin-top: 90px;
+}
+
+.gallery__inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 clamp(1.25rem, 5vw, 3.5rem);
+}
+
+.gallery__header { max-width: 40rem; margin-bottom: clamp(3rem, 6vw, 4.5rem); }
+
+.gallery__eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.75rem;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--gold);
+}
+
+.gallery__eyebrow .num { color: var(--muted); }
+.gallery__eyebrow .rule { width: 2.5rem; height: 1px; background: var(--gold); }
+
+.gallery__title {
+    font-family: var(--font-display);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: clamp(2.3rem, 4.6vw, 3.6rem);
+    line-height: 1.03;
+    letter-spacing: -0.015em;
+    color: var(--cream);
+    margin-bottom: 1.1rem;
+}
+
+.gallery__title em {
+    font-family: var(--font-accent);
+    font-style: italic;
+    font-weight: 500;
+    text-transform: none;
+    color: var(--gold);
+}
+
+.gallery__subtitle {
+    max-width: 30rem;
+    font-size: 1rem;
+    line-height: 1.7;
+    color: var(--muted);
+}
+
+.gallery__grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-auto-rows: 200px;
+    grid-auto-flow: dense;
+    gap: clamp(1rem, 2vw, 1.5rem);
+}
+
+.gallery__item {
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px;
+    border: 1px solid var(--line);
+}
+
+.gallery__item--feature { grid-column: span 2; grid-row: span 2; }
+.gallery__item--tall { grid-row: span 2; }
+.gallery__item--wide { grid-column: span 2; }
+
+.gallery__img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: var(--photo-filter);
+    transform: scale(1);
+    transition: transform 1.2s var(--ease), filter 0.5s var(--ease);
+}
+
+.gallery__item:hover .gallery__img {
+    transform: scale(1.06);
+    filter: var(--photo-filter-hover);
+}
+
+.gallery__tint {
+    position: absolute;
+    inset: 0;
+    background: rgba(20, 14, 8, 0.32);
+    mix-blend-mode: multiply;
+    pointer-events: none;
+}
+
+.gallery__caption {
+    position: absolute;
+    left: 1.1rem;
+    bottom: 1.1rem;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--cream);
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 0.4s var(--ease), transform 0.4s var(--ease);
+}
+
+.gallery__caption .rule { width: 1.25rem; height: 1px; background: var(--gold); }
+.gallery__item:hover .gallery__caption { opacity: 1; transform: translateY(0); }
+
+@media (max-width: 900px) {
+    .gallery__grid { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 180px; }
+}
+
+@media (max-width: 560px) {
+    .gallery__grid { grid-template-columns: 1fr; grid-auto-rows: unset; }
+    .gallery__item,
+    .gallery__item--feature,
+    .gallery__item--tall,
+    .gallery__item--wide {
+        grid-column: span 1;
+        grid-row: span 1;
+        aspect-ratio: 4 / 5;
+    }
+}
+
+/* ============================================================
+   DOBRA 5 — "BARBEIROS" (equipe)
+   Sem fotos de retrato disponíveis — em vez de placeholder
+   genérico, cada card usa um monograma tipográfico grande sobre
+   um painel escuro texturizado (grid schematic + glow ambiente),
+   mantendo a composição de "card de perfil" sem precisar de foto.
+   ============================================================ */
+.team {
+    position: relative;
+    background: radial-gradient(130% 65% at 50% 0%, var(--ink-3) 0%, var(--ink) 60%);
+    border-top: 1px solid var(--line);
+    padding: clamp(5rem, 11vh, 8.5rem) 0;
+    scroll-margin-top: 90px;
+}
+
+.team__inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 clamp(1.25rem, 5vw, 3.5rem);
+}
+
+.team__header { max-width: 40rem; margin-bottom: clamp(3rem, 6vw, 4.5rem); }
+
+.team__eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.75rem;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--gold);
+}
+
+.team__eyebrow .num { color: var(--muted); }
+.team__eyebrow .rule { width: 2.5rem; height: 1px; background: var(--gold); }
+
+.team__title {
+    font-family: var(--font-display);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: clamp(2.3rem, 4.6vw, 3.6rem);
+    line-height: 1.03;
+    letter-spacing: -0.015em;
+    color: var(--cream);
+    margin-bottom: 1.1rem;
+}
+
+.team__title em {
+    font-family: var(--font-accent);
+    font-style: italic;
+    font-weight: 500;
+    text-transform: none;
+    color: var(--gold);
+}
+
+.team__subtitle {
+    max-width: 30rem;
+    font-size: 1rem;
+    line-height: 1.7;
+    color: var(--muted);
+}
+
+.team__grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: clamp(1.5rem, 2.2vw, 1.85rem);
+}
+
+.barber-card {
+    display: flex;
+    flex-direction: column;
+    background: var(--ink-2);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    overflow: hidden;
+    transition: transform 0.4s var(--ease), border-color 0.4s var(--ease), box-shadow 0.4s var(--ease);
+}
+
+.barber-card:hover {
+    transform: translateY(-6px);
+    border-color: rgba(201, 165, 107, 0.4);
+    box-shadow: 0 26px 50px -22px var(--shadow-warm);
+}
+
+.barber-card__portrait {
+    position: relative;
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(160deg, #211c17 0%, #0c0a09 75%);
+}
+
+.barber-card__grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    background-size: 28px 28px;
+    pointer-events: none;
+}
+
+/* Foto real do barbeiro — mesmo filtro unificador de cor usado nos
+   cards de Serviços/Galeria, pra manter a mesma atmosfera do site. */
+.barber-card__photo {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: var(--photo-filter);
+    transform: scale(1);
+    transition: transform 1.1s var(--ease), filter 0.6s var(--ease);
+}
+
+.barber-card:hover .barber-card__photo { transform: scale(1.06); filter: var(--photo-filter-hover); }
+
+.barber-card__photo-tint {
+    position: absolute;
+    inset: 0;
+    background: rgba(20, 14, 8, 0.28);
+    mix-blend-mode: multiply;
+    pointer-events: none;
+}
+
+.barber-card__index {
+    position: absolute;
+    top: 1.1rem;
+    left: 1.15rem;
+    z-index: 3;
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    color: var(--cream);
+    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.85), 0 0 2px rgba(0, 0, 0, 0.6);
+}
+
+.barber-card__monogram {
+    position: relative;
+    z-index: 2;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(2.8rem, 6.5vw, 4rem);
+    letter-spacing: -0.02em;
+    color: var(--gold);
+    transition: transform 0.5s var(--ease);
+}
+
+.barber-card:hover .barber-card__monogram { transform: scale(1.06); }
+
+.barber-card__rule {
+    position: relative;
+    z-index: 2;
+    width: 2rem;
+    height: 1px;
+    background: rgba(201, 165, 107, 0.5);
+    margin-top: 0.9rem;
+}
+
+.barber-card__body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding: 1.5rem 1.5rem 1.75rem;
+}
+
+.barber-card__name {
+    font-family: var(--font-body);
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--cream);
+    margin-bottom: 0.4rem;
+}
+
+.barber-card__role {
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--line);
+}
+
+.barber-card__quote {
+    font-family: var(--font-accent);
+    font-style: italic;
+    font-size: 1.05rem;
+    line-height: 1.55;
+    color: var(--muted);
+    flex: 1;
+}
+
+@media (max-width: 1100px) {
+    .team__grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 600px) {
+    .team__grid { grid-template-columns: 1fr; }
+}
+
+/* ============================================================
+   DOBRA 6 — "AVALIAÇÕES" (prova social)
+   Sem carrossel de plugin: um depoimento em destaque (pull-quote
+   editorial, com aspas grandes decorativas) + 4 depoimentos
+   secundários em cards — a assimetria evita o "grid genérico".
+   ============================================================ */
+.reviews {
+    position: relative;
+    background: radial-gradient(130% 65% at 50% 0%, var(--ink-3) 0%, var(--ink) 60%);
+    border-top: 1px solid var(--line);
+    padding: clamp(5rem, 11vh, 8.5rem) 0;
+    scroll-margin-top: 90px;
+}
+
+.reviews__inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 clamp(1.25rem, 5vw, 3.5rem);
+}
+
+.reviews__header { max-width: 40rem; margin-bottom: 2.25rem; }
+
+.reviews__eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.75rem;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--gold);
+}
+
+.reviews__eyebrow .num { color: var(--muted); }
+.reviews__eyebrow .rule { width: 2.5rem; height: 1px; background: var(--gold); }
+
+.reviews__title {
+    font-family: var(--font-display);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: clamp(2.3rem, 4.6vw, 3.6rem);
+    line-height: 1.03;
+    letter-spacing: -0.015em;
+    color: var(--cream);
+    margin-bottom: 1.1rem;
+}
+
+.reviews__title em {
+    font-family: var(--font-accent);
+    font-style: italic;
+    font-weight: 500;
+    text-transform: none;
+    color: var(--gold);
+}
+
+.reviews__subtitle {
+    max-width: 30rem;
+    font-size: 1rem;
+    line-height: 1.7;
+    color: var(--muted);
+}
+
+/* Barra de confiança — nota + estrelas + contagem, tipográfico */
+.reviews__rating {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.9rem;
+    margin-bottom: clamp(3rem, 6vw, 4rem);
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--line);
+}
+
+.reviews__stars { color: var(--gold); font-size: 1rem; letter-spacing: 0.15em; }
+
+.reviews__score {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: var(--cream);
+}
+
+.reviews__count {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+}
+
+.reviews__dot { color: var(--line); }
+
+/* Depoimento em destaque — pull-quote com aspas gigantes decorativas */
+.reviews__featured {
+    position: relative;
+    padding: clamp(2.25rem, 5vw, 3.25rem) clamp(1.75rem, 5vw, 4rem);
+    background: var(--ink-2);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: clamp(2rem, 4vw, 3rem);
+}
+
+.reviews__quote-mark {
+    position: absolute;
+    top: -2.5rem;
+    left: 1.25rem;
+    font-family: var(--font-accent);
+    font-style: italic;
+    font-size: 11rem;
+    line-height: 1;
+    color: rgba(201, 165, 107, 0.14);
+    pointer-events: none;
+    user-select: none;
+}
+
+.reviews__featured-text {
+    position: relative;
+    z-index: 1;
+    font-family: var(--font-accent);
+    font-style: italic;
+    font-weight: 500;
+    font-size: clamp(1.35rem, 2.6vw, 2rem);
+    line-height: 1.4;
+    color: var(--cream);
+    max-width: 46rem;
+    margin-bottom: 1.75rem;
+}
+
+.reviews__featured-author {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.9rem;
+}
+
+.reviews__featured-name {
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--cream);
+}
+
+.reviews__featured-meta {
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gold);
+}
+
+.reviews__featured-stars { color: var(--gold); font-size: 0.85rem; letter-spacing: 0.1em; margin-left: auto; }
+
+.reviews__grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: clamp(1.25rem, 2vw, 1.75rem);
+}
+
+.review-card {
+    display: flex;
+    flex-direction: column;
+    background: var(--ink-2);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 1.75rem;
+    transition: transform 0.4s var(--ease), border-color 0.4s var(--ease), box-shadow 0.4s var(--ease);
+}
+
+.review-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(201, 165, 107, 0.35);
+    box-shadow: 0 22px 44px -22px var(--shadow-warm);
+}
+
+.review-card__stars { color: var(--gold); font-size: 0.78rem; letter-spacing: 0.12em; margin-bottom: 0.9rem; }
+
+.review-card__text {
+    font-size: 0.92rem;
+    line-height: 1.65;
+    color: var(--muted);
+    margin-bottom: 1.25rem;
+    flex: 1;
+}
+
+.review-card__name { font-family: var(--font-body); font-weight: 600; font-size: 0.9rem; color: var(--cream); }
+
+.review-card__role {
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 0.2rem;
+}
+
+@media (max-width: 900px) {
+    .reviews__quote-mark { font-size: 8rem; top: -1.75rem; }
+}
+
+@media (max-width: 700px) {
+    .reviews__grid { grid-template-columns: 1fr; }
+    .reviews__featured-author { align-items: flex-start; }
+    .reviews__featured-stars { margin-left: 0; }
+}
+
+/* ============================================================
+   DOBRA 7 — "AGENDAR" (contato + CTA final)
+   CTA grande e centralizado no topo (elemento principal, como
+   pedido), seguido por uma faixa de dados objetivos (endereço,
+   horário, telefone, instagram) e um bloco de localização
+   estilizado — sem depender de embed de mapa real (endereço
+   fictício até serem informados os dados reais da barbearia).
+   ============================================================ */
+.contact {
+    position: relative;
+    background: radial-gradient(130% 65% at 50% 0%, var(--ink-3) 0%, var(--ink) 60%);
+    border-top: 1px solid var(--line);
+    padding: clamp(5rem, 11vh, 8.5rem) 0;
+    scroll-margin-top: 90px;
+}
+
+.contact__inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 clamp(1.25rem, 5vw, 3.5rem);
+}
+
+.contact__cta {
+    max-width: 34rem;
+    margin: 0 auto clamp(3.5rem, 7vw, 5rem);
+    text-align: center;
+}
+
+.contact__eyebrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 1.75rem;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--gold);
+}
+
+.contact__eyebrow .num { color: var(--muted); }
+.contact__eyebrow .rule { width: 2.5rem; height: 1px; background: var(--gold); }
+
+.contact__title {
+    font-family: var(--font-display);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: clamp(2.3rem, 4.6vw, 3.6rem);
+    line-height: 1.03;
+    letter-spacing: -0.015em;
+    color: var(--cream);
+    margin-bottom: 1.1rem;
+}
+
+.contact__title em {
+    font-family: var(--font-accent);
+    font-style: italic;
+    font-weight: 500;
+    text-transform: none;
+    color: var(--gold);
+}
+
+.contact__subtitle {
+    font-size: 1rem;
+    line-height: 1.7;
+    color: var(--muted);
+    margin-bottom: 2.25rem;
+}
+
+.contact__actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.1rem;
+}
+
+.contact__phone-link {
+    font-size: 0.85rem;
+    color: var(--muted);
+    padding-bottom: 2px;
+    border-bottom: 1px solid transparent;
+    transition: color 0.25s var(--ease), border-color 0.25s var(--ease);
+}
+
+.contact__phone-link:hover { color: var(--gold); border-color: var(--gold); }
+
+/* Faixa de dados objetivos */
+.contact__details {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: clamp(1.5rem, 2.2vw, 2rem);
+    padding: clamp(2.25rem, 4.5vw, 3rem) 0;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    margin-bottom: clamp(2.5rem, 5vw, 3.5rem);
+}
+
+.contact__detail-label {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 0.64rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 0.7rem;
+}
+
+.contact__detail-value {
+    font-size: 0.92rem;
+    line-height: 1.6;
+    color: var(--cream);
+}
+
+.contact__detail-value a {
+    color: inherit;
+    border-bottom: 1px solid rgba(236, 231, 223, 0.3);
+    transition: color 0.25s var(--ease), border-color 0.25s var(--ease);
+}
+
+.contact__detail-value a:hover { color: var(--gold); border-color: var(--gold); }
+
+/* Bloco de localização estilizado (sem embed real) */
+.contact__map {
+    position: relative;
+    aspect-ratio: 21 / 6;
+    min-height: 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.65rem;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: linear-gradient(160deg, #1a1613 0%, #0c0a09 80%);
+}
+
+.contact__map-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    background-size: 32px 32px;
+    animation: pan-grid 10s linear infinite;
+    pointer-events: none;
+}
+
+@keyframes map-ping {
+    0% { transform: scale(1); opacity: 0.6; }
+    100% { transform: scale(2.6); opacity: 0; }
+}
+
+.contact__pin {
+    position: relative;
+    z-index: 2;
+    width: 12px;
+    height: 12px;
+    border-radius: 9999px;
+    background: var(--gold);
+}
+
+.contact__pin::after {
+    content: "";
+    position: absolute;
+    inset: -6px;
+    border: 1px solid var(--gold);
+    border-radius: 9999px;
+    animation: map-ping 2.4s ease-out infinite;
+}
+
+.contact__map-address {
+    position: relative;
+    z-index: 2;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.05rem;
+    color: var(--cream);
+}
+
+.contact__map-caption {
+    position: relative;
+    z-index: 2;
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted);
+}
+
+@media (max-width: 900px) {
+    .contact__details { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 560px) {
+    .contact__details { grid-template-columns: 1fr; }
+    .contact__map { aspect-ratio: 4 / 3; }
+}
+
+/* ============================================================
+   FOOTER — encerramento limpo: marca, navegação, contato e
+   direitos autorais. Sem flourish extra — só o essencial, bem
+   espaçado, na mesma paleta escura/dourada do restante do site.
+   ============================================================ */
+.site-footer {
+    background: var(--ink-2);
+    border-top: 1px solid var(--line);
+}
+
+.site-footer__inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: clamp(3.5rem, 7vw, 5rem) clamp(1.25rem, 5vw, 3.5rem) clamp(2rem, 4vw, 2.5rem);
+}
+
+.site-footer__top {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr;
+    gap: clamp(2.5rem, 5vw, 4rem);
+    padding-bottom: clamp(2.5rem, 5vw, 3.5rem);
+    border-bottom: 1px solid var(--line);
+}
+
+.site-footer__logo {
+    display: inline-block;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.05rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--cream);
+    margin-bottom: 1rem;
+    transition: color 0.25s var(--ease);
+}
+
+.site-footer__logo em {
+    font-family: var(--font-accent);
+    font-style: italic;
+    text-transform: none;
+    letter-spacing: 0.02em;
+    font-size: 1.15em;
+    color: var(--gold);
+}
+
+.site-footer__tagline {
+    max-width: 24rem;
+    font-size: 0.9rem;
+    line-height: 1.7;
+    color: var(--muted);
+}
+
+.site-footer__col-title {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 0.64rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 1.25rem;
+}
+
+.site-footer__links {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.site-footer__links li {
+    font-size: 0.88rem;
+    line-height: 1.6;
+    color: var(--muted);
+}
+
+.site-footer__links a {
+    color: inherit;
+    transition: color 0.25s var(--ease);
+}
+
+.site-footer__links a:hover { color: var(--gold); }
+
+.site-footer__bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding-top: clamp(1.5rem, 3vw, 2rem);
+}
+
+.site-footer__copy {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+}
+
+.site-footer__top-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    transition: color 0.25s var(--ease);
+}
+
+.site-footer__top-link:hover { color: var(--gold); }
+.site-footer__top-link span { transition: transform 0.25s var(--ease); }
+.site-footer__top-link:hover span { transform: translateY(-3px); }
+
+@media (max-width: 800px) {
+    .site-footer__top { grid-template-columns: 1fr 1fr; }
+    .site-footer__brand { grid-column: span 2; }
+}
+
+@media (max-width: 480px) {
+    .site-footer__top { grid-template-columns: 1fr; }
+    .site-footer__brand { grid-column: span 1; }
+    .site-footer__bottom { flex-direction: column; align-items: flex-start; }
+}
+
+/* --- Scroll cue + linha de progresso do scrub --- */
+.hero__cue {
+    position: absolute;
+    bottom: 1.75rem;
+    left: clamp(1.25rem, 5vw, 3.5rem);
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    color: rgba(236, 231, 223, 0.55);
+}
+
+.hero__cue .dot {
+    width: 32px; height: 32px;
+    border: 1px solid rgba(236, 231, 223, 0.3);
+    border-radius: 9999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    animation: cue-bounce 2.2s var(--ease) infinite;
+}
+
+@keyframes cue-bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(6px); }
+}
+
+.hero__cue span {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+}
+
+/* Hairline dourada que acompanha o progresso do vídeo */
+.hero__progress {
+    position: absolute;
+    bottom: 0; left: 0;
+    z-index: 11;
+    width: 100%;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.hero__progress i {
+    display: block;
+    height: 100%;
+    background: var(--gold);
+    transform: scaleX(0);
+    transform-origin: left;
+}
+
+/* ============================================================
+   RESPONSIVO
+   ============================================================ */
+@media (max-width: 900px) {
+    .nav__links { display: none; }
+    .nav__cta { display: none; }
+    .nav__burger { display: flex; }
+    .hero__actions { gap: 1.5rem; }
+    .hero__title { max-width: none; }
+}
+
+@media (max-width: 480px) {
+    .beam-btn .beam-face { padding: 0.95rem 1.7rem; }
+    .hero__content { padding-bottom: 5.5rem; }
+}
+
+/* Menos movimento para quem preferir */
+@media (prefers-reduced-motion: reduce) {
+    .hero__cue .dot { animation: none; }
+    html { scroll-behavior: auto; }
+}

@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="pt-BR">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Design System — Signal / Architect</title>
+    <script src="digital-architect.aura.build/assets/resource_3fa48481346f.js"></script>
+    <script src="digital-architect.aura.build/assets/iconify-icon_d39ffc6e4c56.js"></script>
+    <link href="digital-architect.aura.build/assets/css2_19fd9cc6b396.css" rel="stylesheet" />
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #EAEAE5;
+            color: #1C1C1C;
+            overflow-x: hidden;
+        }
+
+        /* ============ Base Reveal Animation (Scroll triggered) ============ */
+        .reveal {
+            opacity: 0;
+            transform: translateY(2rem);
+            transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Masked Text Reveal (Hero Title) */
+        .text-reveal-wrapper {
+            overflow: hidden;
+            display: inline-block;
+            vertical-align: bottom;
+        }
+
+        .text-reveal-content {
+            transform: translateY(110%);
+            opacity: 0;
+            transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1), opacity 1.2s ease;
+            display: block;
+        }
+
+        .reveal-active .text-reveal-content {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        /* Stagger Delays */
+        .delay-100 { transition-delay: 0.1s; }
+        .delay-200 { transition-delay: 0.2s; }
+        .delay-300 { transition-delay: 0.3s; }
+        .delay-400 { transition-delay: 0.4s; }
+        .delay-500 { transition-delay: 0.5s; }
+        .delay-600 { transition-delay: 0.6s; }
+        .delay-700 { transition-delay: 0.7s; }
+        .delay-900 { transition-delay: 0.9s; }
+
+        /* Carousel Fade & Ken Burns */
+        .carousel-slide {
+            position: absolute;
+            inset: 0;
+            transition: opacity 1.8s ease-in-out;
+            opacity: 0;
+            overflow: hidden;
+        }
+
+        .carousel-slide.active { opacity: 1; }
+
+        .carousel-slide img {
+            transform: scale(1);
+            transition: transform 11s ease-out;
+        }
+
+        .carousel-slide.active img { transform: scale(1.12); }
+
+        /* Marquee Animation */
+        .marquee-container { display: flex; overflow: hidden; user-select: none; }
+        .marquee-content {
+            flex-shrink: 0;
+            display: flex;
+            justify-content: space-around;
+            min-width: 100%;
+            animation: scroll 40s linear infinite;
+        }
+        @keyframes scroll {
+            from { transform: translateX(0); }
+            to { transform: translateX(-100%); }
+        }
+
+        /* Nav Load Animation */
+        .nav-load { opacity: 0; transform: translateY(-10px); transition: all 0.8s ease-out; }
+        .nav-load.loaded { opacity: 1; transform: translateY(0); }
+
+        iconify-icon { display: inline-flex; align-items: center; justify-content: center; vertical-align: middle; }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .parallax-element, .parallax-img { will-change: transform; }
+
+        /* ============ NEW: Glow / Blob Field (ambient, used across folds) ============ */
+        @keyframes drift {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(3%, -4%) scale(1.08); }
+            66% { transform: translate(-3%, 3%) scale(0.95); }
+        }
+        @keyframes morph {
+            0%, 100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+            50% { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; }
+        }
+        .glow-orb {
+            position: absolute;
+            filter: blur(60px);
+            animation: drift 14s ease-in-out infinite, morph 10s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        /* Subtle blueprint grid overlay */
+        .bg-schematic {
+            background-image:
+                linear-gradient(to right, rgba(28,25,23,0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(28,25,23,0.05) 1px, transparent 1px);
+            background-size: 44px 44px;
+        }
+        .bg-schematic-dark {
+            background-image:
+                linear-gradient(to right, rgba(255,255,255,0.06) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255,255,255,0.06) 1px, transparent 1px);
+            background-size: 44px 44px;
+        }
+        @keyframes pan-grid {
+            0% { background-position: 0 0; }
+            100% { background-position: 44px 44px; }
+        }
+        .animate-pan-grid { animation: pan-grid 6s linear infinite; }
+
+        /* ============ Beam / Shimmer Button (adapted for light + dark surfaces) ============ */
+        @keyframes shimmer {
+            from { transform: translateX(-120%) skewX(-15deg); }
+            to { transform: translateX(220%) skewX(-15deg); }
+        }
+        .beam-btn { position: relative; border-radius: 9999px; padding: 1px; overflow: hidden; }
+        .beam-btn .beam-ring {
+            position: absolute;
+            inset: -1000%;
+            animation: spin 2.4s linear infinite;
+            background: conic-gradient(from 0deg, transparent 0 340deg, currentColor 360deg);
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .beam-btn .beam-face { position: relative; z-index: 10; overflow: hidden; }
+        .beam-btn .beam-sweep {
+            position: absolute; inset: 0; overflow: hidden; pointer-events: none;
+        }
+        .beam-btn .beam-sweep span {
+            position: absolute; top: 0; left: 0; height: 100%; width: 100%;
+            transform: skewX(-15deg);
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent);
+            opacity: 0;
+        }
+        .beam-btn:hover .beam-sweep span { opacity: 1; animation: shimmer 1.3s infinite; }
+
+        /* ============ Flashlight hover card (adapted to light theme) ============ */
+        .flashlight-card { position: relative; }
+        .flashlight-card::before {
+            content: "";
+            position: absolute;
+            inset: 0px;
+            background: radial-gradient(500px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(28,25,23,0.08), transparent 45%);
+            opacity: 0;
+            transition: opacity 0.5s;
+            pointer-events: none;
+            z-index: 2;
+        }
+        .flashlight-card:hover::before { opacity: 1; }
+        .flashlight-card-dark::before {
+            background: radial-gradient(500px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255,255,255,0.10), transparent 45%);
+        }
+
+        /* ============ Letter-by-letter clip reveal (typography demo) ============ */
+        @keyframes letter-in {
+            0% { transform: translateY(100%); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+        .clip-letters span {
+            display: inline-block;
+            transform: translateY(100%);
+            opacity: 0;
+            animation: letter-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        .clip-letters.active span { animation-play-state: running; }
+        .clip-letters:not(.active) span { animation-play-state: paused; }
+
+        /* ============ Modal ============ */
+        #ds-modal { transition: opacity 0.35s cubic-bezier(0.16,1,0.3,1); }
+        #ds-modal .modal-panel { transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1), opacity 0.35s ease; }
+        #ds-modal.hidden-modal { opacity: 0; pointer-events: none; }
+        #ds-modal.hidden-modal .modal-panel { transform: translateY(16px) scale(0.96); opacity: 0; }
+
+        /* ============ Tooltip ============ */
+        .tooltip-box {
+            position: absolute;
+            transform: translateY(6px) scale(0.95);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            pointer-events: none;
+        }
+        .tooltip-trigger:hover .tooltip-box { transform: translateY(0) scale(1); opacity: 1; }
+
+        /* ============ Toggle switch ============ */
+        .ds-toggle { width: 44px; height: 24px; border-radius: 9999px; background: #d6d3d1; position: relative; transition: background 0.3s; cursor: pointer; }
+        .ds-toggle .knob { position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; border-radius: 9999px; background: white; transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1); box-shadow: 0 1px 2px rgba(0,0,0,0.3); }
+        .ds-toggle.on { background: #1c1917; }
+        .ds-toggle.on .knob { transform: translateX(20px); }
+
+        /* ============ Animated checkbox check-draw ============ */
+        .check-path { stroke-dasharray: 20; stroke-dashoffset: 20; transition: stroke-dashoffset 0.3s ease 0.05s; }
+        .ds-checkbox.checked .check-path { stroke-dashoffset: 0; }
+        .ds-checkbox.checked .box-fill { fill: #1c1917; stroke: #1c1917; }
+
+        /* Section eyebrow bar (reused constantly across folds) */
+        .fold-header { padding: 2rem 2rem; border-bottom: 1px solid #d6d3d1; background: rgba(245,245,244,0.6); }
+
+        ::selection { background: #1c1917; color: white; }
+    </style>
+</head>
+
+<body class="antialiased min-h-screen selection:bg-stone-800 selection:text-white pb-10">
+
+    <div class="max-w-[1400px] mx-auto border-x border-stone-300 relative bg-[#EAEAE5]">
+
+        <!-- Vertical Grid Guide Lines -->
+        <div class="absolute inset-0 pointer-events-none grid grid-cols-1 md:grid-cols-12 gap-0 z-0 h-full w-full">
+            <div class="hidden md:block md:col-span-3 border-r border-stone-300/40 h-full"></div>
+            <div class="hidden md:block md:col-span-6 border-r border-stone-300/40 h-full"></div>
+            <div class="hidden md:block md:col-span-3 h-full"></div>
+        </div>
+
+        <!-- ============================== NAVIGATION ============================== -->
+        <header class="relative z-50 border-b border-stone-300 sticky top-0 bg-[#EAEAE5]/90 backdrop-blur-md nav-load">
+            <div class="flex justify-between items-center px-4 md:px-6 py-5">
+                <div class="flex items-center gap-6">
+                    <a class="text-xs font-medium tracking-widest uppercase hover:text-stone-500 transition-colors" href="#typography">Typography</a>
+                    <a class="text-xs font-medium tracking-widest uppercase hover:text-stone-500 transition-colors" href="#colors">Colors</a>
+                    <a class="text-xs font-medium tracking-widest uppercase hidden md:block hover:text-stone-500 transition-colors" href="#components">Components</a>
+                </div>
+                <div class="absolute left-1/2 -translate-x-1/2 flex items-center gap-2 group cursor-pointer">
+                    <iconify-icon class="text-xl group-hover:rotate-180 transition-transform duration-700" icon="solar:atom-linear"></iconify-icon>
+                    <span class="font-bold tracking-tighter text-lg">SIGNAL / SYSTEM</span>
+                </div>
+                <div class="flex items-center gap-6">
+                    <a class="text-xs font-medium tracking-widest uppercase hidden md:block hover:text-stone-500 transition-colors" href="#icons">Icons</a>
+                    <a class="text-xs font-medium tracking-widest uppercase hover:text-stone-500 transition-colors" href="#motion">Motion</a>
+                </div>
+            </div>
+        </header>
+
+        <!-- ============================== 0) HERO — CAPABILITY SHOWCASE ============================== -->
+        <section class="relative z-10 grid grid-cols-1 md:grid-cols-12 border-b border-stone-300 min-h-[820px] overflow-hidden bg-stone-900">
+
+            <!-- Full-bleed carousel background -->
+            <div class="col-span-1 md:col-span-12 absolute inset-0" id="hero-carousel">
+                <div class="carousel-slide active">
+                    <img class="w-full h-full object-cover grayscale contrast-125 brightness-[.55] parallax-img" data-speed="0.04" src="digital-architect.aura.build/assets/c7fa69dd-d7fb-48f2-a866-ef3663_f6b789593f38.webp" />
+                </div>
+                <div class="carousel-slide">
+                    <img class="w-full h-full object-cover grayscale contrast-125 brightness-[.55] parallax-img" data-speed="0.04" src="digital-architect.aura.build/assets/6c710de5-9712-4c8e-a7db-59ac54_b647957b5aa5.webp" />
+                </div>
+                <div class="carousel-slide">
+                    <img class="w-full h-full object-cover grayscale contrast-125 brightness-[.55] parallax-img" data-speed="0.04" src="digital-architect.aura.build/assets/62cc53b7-3355-4618-b7fa-3283f6_a6d3415bc434.webp" />
+                </div>
+            </div>
+
+            <!-- Schematic grid overlay, slow pan (mix-blend for texture) -->
+            <div class="absolute inset-0 bg-schematic-dark animate-pan-grid opacity-60 mix-blend-overlay pointer-events-none"></div>
+
+            <!-- Ambient glow orbs, drifting behind the title -->
+            <div class="glow-orb w-[420px] h-[420px] bg-white/10 -top-20 left-[8%]"></div>
+            <div class="glow-orb w-[360px] h-[360px] bg-white/10 bottom-0 right-[10%] delay-500"></div>
+
+            <!-- Gradient wash for legibility -->
+            <div class="absolute inset-0 bg-gradient-to-t from-stone-950 via-stone-950/30 to-stone-950/10 pointer-events-none"></div>
+            <div class="absolute inset-0 bg-gradient-to-r from-stone-950/70 via-transparent to-stone-950/40 pointer-events-none"></div>
+
+            <!-- Content grid -->
+            <div class="relative z-20 col-span-1 md:col-span-12 grid grid-cols-1 md:grid-cols-12 min-h-[820px]">
+
+                <!-- Main text column -->
+                <div class="col-span-1 md:col-span-9 flex flex-col justify-end p-6 md:p-12 border-r-0 md:border-r border-white/10">
+
+                    <!-- Glass badges -->
+                    <div class="flex items-center gap-3 mb-8 reveal delay-200 hero-badge">
+                        <span class="px-3 py-1 border border-white/30 rounded-full text-xs font-mono uppercase backdrop-blur-md text-white/90">v2.0 Combinado</span>
+                        <span class="px-3 py-1 border border-white/30 rounded-full text-xs font-mono uppercase backdrop-blur-md text-white/90 flex items-center gap-1.5">
+                            <span class="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></span> Live Demo
+                        </span>
+                    </div>
+
+                    <!-- Transparent / mix-blend-difference lettering (signature of the Architect system) -->
+                    <h1 class="text-[3.6rem] leading-[0.92] md:text-[8.5rem] font-semibold tracking-tighter mb-6 text-white mix-blend-difference" id="hero-title">
+                        <span class="text-reveal-wrapper"><span class="text-reveal-content delay-200">Design</span></span>
+                        <span class="text-reveal-wrapper"><span class="text-reveal-content delay-400">as</span></span><br/>
+                        <span class="text-reveal-wrapper"><span class="text-reveal-content delay-600">Signal.</span></span>
+                    </h1>
+
+                    <p class="max-w-lg text-sm md:text-base text-stone-300 leading-relaxed mb-10 reveal delay-700">
+                        Um sistema de design monocromático, tipografia com máscara transparente e movimento de precisão —
+                        combinando arquitetura tipográfica, glassmorphism e micro-interações em uma única linguagem visual.
+                    </p>
+
+                    <!-- CTA row: beam-glow primary + ghost link -->
+                    <div class="flex flex-wrap items-center gap-6 reveal delay-900">
+                        <a href="#components" class="beam-btn text-white">
+                            <span class="beam-ring"></span>
+                            <span class="beam-face flex items-center gap-2 rounded-full bg-stone-950 px-8 py-4 ring-1 ring-white/15">
+                                <span class="beam-sweep"><span></span></span>
+                                <span class="relative z-10 text-sm font-medium tracking-wide">Explorar Componentes</span>
+                                <iconify-icon class="relative z-10 text-lg" icon="solar:arrow-right-linear"></iconify-icon>
+                            </span>
+                        </a>
+                        <a href="#motion" class="text-sm font-medium text-stone-300 hover:text-white border-b border-stone-500 hover:border-white pb-0.5 transition-colors">
+                            Ver Motion System →
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Stats column -->
+                <div class="col-span-1 md:col-span-3 grid grid-rows-4">
+                    <div class="row-span-1 border-b border-t md:border-t-0 border-white/10 p-6 md:p-8 flex flex-col justify-between reveal delay-500 hero-stat group hover:bg-white/5 transition-colors">
+                        <iconify-icon class="text-2xl md:text-3xl text-stone-400 group-hover:text-white transition-colors" icon="solar:layers-minimalistic-linear"></iconify-icon>
+                        <div>
+                            <h2 class="text-4xl md:text-5xl font-medium tracking-tighter text-white">24</h2>
+                            <span class="text-xs font-mono text-stone-400 mt-1 block">COMPONENTES</span>
+                        </div>
+                    </div>
+                    <div class="row-span-1 border-b border-white/10 p-6 md:p-8 flex flex-col justify-between reveal delay-600 hero-stat group hover:bg-white/5 transition-colors">
+                        <iconify-icon class="text-2xl md:text-3xl text-stone-400 group-hover:text-white transition-colors" icon="solar:palette-linear"></iconify-icon>
+                        <div>
+                            <h2 class="text-4xl md:text-5xl font-medium tracking-tighter text-white">08</h2>
+                            <span class="text-xs font-mono text-stone-400 mt-1 block">TOKENS DE COR</span>
+                        </div>
+                    </div>
+                    <div class="row-span-1 border-b border-white/10 p-6 md:p-8 flex flex-col justify-between reveal delay-700 hero-stat group hover:bg-white/5 transition-colors">
+                        <iconify-icon class="text-2xl md:text-3xl text-stone-400 group-hover:text-white transition-colors" icon="solar:text-bold-linear"></iconify-icon>
+                        <div>
+                            <h2 class="text-4xl md:text-5xl font-medium tracking-tighter text-white">11</h2>
+                            <span class="text-xs font-mono text-stone-400 mt-1 block">ESTILOS TIPO</span>
+                        </div>
+                    </div>
+                    <div class="row-span-1 p-6 md:p-8 flex flex-col justify-between reveal delay-700 hero-stat group hover:bg-white/5 transition-colors relative overflow-hidden">
+                        <iconify-icon class="text-2xl md:text-3xl text-stone-400 group-hover:text-white transition-colors" icon="solar:cup-star-linear"></iconify-icon>
+                        <div>
+                            <h2 class="text-4xl md:text-5xl font-medium tracking-tighter text-white">16</h2>
+                            <span class="text-xs font-mono text-stone-400 mt-1 block">ANIMAÇÕES</span>
+                        </div>
+                        <div class="absolute top-4 right-4">
+                            <iconify-icon class="text-stone-700 text-6xl opacity-0 group-hover:opacity-100 transition-opacity duration-700 [animation:spin_6s_linear_infinite]" icon="solar:star-fall-linear"></iconify-icon>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Scroll cue -->
+            <div class="absolute bottom-6 left-6 md:left-12 z-20 flex items-center gap-3 text-white/60 reveal delay-900">
+                <div class="w-8 h-8 rounded-full border border-white/30 flex items-center justify-center animate-bounce">
+                    <iconify-icon class="text-sm" icon="solar:arrow-down-linear"></iconify-icon>
+                </div>
+                <span class="text-[10px] font-mono uppercase tracking-widest">Scroll para explorar</span>
+            </div>
+        </section>
+
+        <!-- Marquee / Divider -->
+        <div class="border-b border-stone-300 overflow-hidden py-6 bg-stone-100/60">
+            <div class="marquee-container">
+                <div class="marquee-content">
+                    <span class="text-sm font-mono uppercase tracking-widest text-stone-500 mx-8">Inter Variable · 100–900</span>
+                    <span class="text-sm font-mono uppercase tracking-widest text-stone-500 mx-8">•</span>
+                    <span class="text-sm font-mono uppercase tracking-widest text-stone-500 mx-8">Easing cubic-bezier(0.16, 1, 0.3, 1)</span>
+                    <span class="text-sm font-mono uppercase tracking-widest text-stone-500 mx-8">•</span>
+                    <span class="text-sm font-mono uppercase tracking-widest text-stone-500 mx-8">Grid de 12 Colunas</span>
+                    <span class="text-sm font-mono uppercase tracking-widest text-stone-500 mx-8">•</span>
+                    <span class="text-sm font-mono uppercase tracking-widest text-stone-500 mx-8">Contraste AA/AAA</span>
+                    <span class="text-sm font-mono uppercase tracking-widest text-stone-500 mx-8">•</span>
+                </div>
+                <div class="marquee-content">
+                    <span class="text-sm font-mono uppercase tracking-widest text-stone-500 mx-8">Inter Variable · 100–900</span>
+                    <span class="text-sm font-mono uppercase tracking-widest text-stone-500 mx-8">•</span>
+                    <span class="text-sm font-mono uppercase tracking-widest text-stone-500 mx-8">Easing cubic-bezier(0.16, 1, 0.3, 1)</span>
+                    <span class="text-sm font-mono uppercase tracking-widest text-stone-500 mx-8">•</span>
+                    <span class="text-sm font-mono uppercase tracking-widest text-stone-500 mx-8">Grid de 12 Colunas</span>
+                    <span class="text-sm font-mono uppercase tracking-widest text-stone-500 mx-8">•</span>
+                    <span class="text-sm font-mono uppercase tracking-widest text-stone-500 mx-8">Contraste AA/AAA</span>
+                    <span class="text-sm font-mono uppercase tracking-widest text-stone-500 mx-8">•</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================== 1) TYPOGRAPHY ============================== -->
+        <section id="typography" class="relative z-10 border-b border-stone-300 bg-schematic overflow-hidden">
+            <div class="glow-orb w-[300px] h-[300px] bg-stone-300/40 -top-32 right-[5%] pointer-events-none"></div>
+
+            <div class="fold-header reveal">
+                <span class="text-xs font-mono uppercase text-stone-500 block mb-2">01 / Fundamentos</span>
+                <h2 class="text-4xl font-medium tracking-tight">Tipografia</h2>
+                <p class="text-sm text-stone-500 mt-3 max-w-xl leading-relaxed">
+                    Família primária <strong class="text-stone-800">Inter</strong>, hospedada localmente
+                    (self-hosted via <code class="font-mono text-xs bg-stone-200 px-1.5 py-0.5 rounded">@font-face</code>,
+                    faixa de peso 100–900, <code class="font-mono text-xs bg-stone-200 px-1.5 py-0.5 rounded">font-display: swap</code>).
+                    Fallback: <code class="font-mono text-xs bg-stone-200 px-1.5 py-0.5 rounded">sans-serif</code>.
+                    Monoespaçada: pilha padrão do sistema (<code class="font-mono text-xs bg-stone-200 px-1.5 py-0.5 rounded">font-mono</code> nativo — ui-monospace, Menlo, Consolas).
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 relative z-10">
+                <!-- H1 -->
+                <div class="grid grid-cols-1 md:grid-cols-12 border-b border-stone-300 p-8 md:p-12 items-baseline reveal">
+                    <div class="col-span-3 text-xs font-mono text-stone-400 uppercase tracking-widest mb-4 md:mb-0">H1 / Display</div>
+                    <div class="col-span-6">
+                        <h1 class="text-6xl md:text-8xl font-semibold tracking-tighter leading-none text-stone-900">Design & Signal</h1>
+                    </div>
+                    <div class="col-span-3 text-right text-xs font-mono text-stone-400 leading-relaxed">
+                        Inter · 600 · 6rem/1<br/>tracking-tighter (-0.05em) · normal-case
+                    </div>
+                </div>
+                <!-- H2 -->
+                <div class="grid grid-cols-1 md:grid-cols-12 border-b border-stone-300 p-8 md:p-12 items-baseline reveal">
+                    <div class="col-span-3 text-xs font-mono text-stone-400 uppercase tracking-widest mb-4 md:mb-0">H2 / Heading</div>
+                    <div class="col-span-6">
+                        <h2 class="text-5xl font-medium tracking-tighter text-stone-900">Estratégia & Sistema</h2>
+                    </div>
+                    <div class="col-span-3 text-right text-xs font-mono text-stone-400 leading-relaxed">
+                        Inter · 500 · 3rem/1.1<br/>tracking-tighter · normal-case
+                    </div>
+                </div>
+                <!-- H3 -->
+                <div class="grid grid-cols-1 md:grid-cols-12 border-b border-stone-300 p-8 md:p-12 items-baseline reveal">
+                    <div class="col-span-3 text-xs font-mono text-stone-400 uppercase tracking-widest mb-4 md:mb-0">H3 / Section</div>
+                    <div class="col-span-6">
+                        <h3 class="text-4xl font-medium tracking-tight text-stone-900">Estudos de Caso</h3>
+                    </div>
+                    <div class="col-span-3 text-right text-xs font-mono text-stone-400 leading-relaxed">
+                        Inter · 500 · 2.25rem/1.2<br/>tracking-tight (-0.025em)
+                    </div>
+                </div>
+                <!-- H4 -->
+                <div class="grid grid-cols-1 md:grid-cols-12 border-b border-stone-300 p-8 md:p-12 items-baseline reveal">
+                    <div class="col-span-3 text-xs font-mono text-stone-400 uppercase tracking-widest mb-4 md:mb-0">H4 / Card Title</div>
+                    <div class="col-span-6">
+                        <h4 class="text-3xl font-medium tracking-tight text-stone-900">Nova Finance</h4>
+                    </div>
+                    <div class="col-span-3 text-right text-xs font-mono text-stone-400 leading-relaxed">
+                        Inter · 500 · 1.875rem/1.25<br/>tracking-tight
+                    </div>
+                </div>
+                <!-- H5 -->
+                <div class="grid grid-cols-1 md:grid-cols-12 border-b border-stone-300 p-8 md:p-12 items-baseline reveal">
+                    <div class="col-span-3 text-xs font-mono text-stone-400 uppercase tracking-widest mb-4 md:mb-0">H5 / List Title</div>
+                    <div class="col-span-6">
+                        <h5 class="text-xl font-medium tracking-normal text-stone-900">Hoverable List Title</h5>
+                    </div>
+                    <div class="col-span-3 text-right text-xs font-mono text-stone-400 leading-relaxed">
+                        Inter · 500 · 1.25rem/1.4<br/>tracking-normal
+                    </div>
+                </div>
+                <!-- H6 -->
+                <div class="grid grid-cols-1 md:grid-cols-12 border-b border-stone-300 p-8 md:p-12 items-baseline reveal">
+                    <div class="col-span-3 text-xs font-mono text-stone-400 uppercase tracking-widest mb-4 md:mb-0">H6 / Eyebrow</div>
+                    <div class="col-span-6">
+                        <h6 class="text-xs font-bold uppercase tracking-widest text-stone-900">01 / Selected Work</h6>
+                    </div>
+                    <div class="col-span-3 text-right text-xs font-mono text-stone-400 leading-relaxed">
+                        Inter · 700 · 0.75rem/1<br/>tracking-widest (0.1em) · UPPERCASE
+                    </div>
+                </div>
+                <!-- Body Large -->
+                <div class="grid grid-cols-1 md:grid-cols-12 border-b border-stone-300 p-8 md:p-12 items-baseline reveal">
+                    <div class="col-span-3 text-xs font-mono text-stone-400 uppercase tracking-widest mb-4 md:mb-0">Body Large</div>
+                    <div class="col-span-6">
+                        <p class="text-lg leading-relaxed text-stone-800">Thoughts on the intersection of design, technology and human psychology — building better tools for thought.</p>
+                    </div>
+                    <div class="col-span-3 text-right text-xs font-mono text-stone-400 leading-relaxed">
+                        Inter · 400 · 1.125rem/1.75<br/>tracking-normal
+                    </div>
+                </div>
+                <!-- Body -->
+                <div class="grid grid-cols-1 md:grid-cols-12 border-b border-stone-300 p-8 md:p-12 items-baseline reveal">
+                    <div class="col-span-3 text-xs font-mono text-stone-400 uppercase tracking-widest mb-4 md:mb-0">Body</div>
+                    <div class="col-span-6">
+                        <p class="text-sm md:text-base text-stone-600 leading-relaxed">Redesenhando o fluxo de investimento para usuários Gen Z, resultando em 40% de conversão a mais via gamificação.</p>
+                    </div>
+                    <div class="col-span-3 text-right text-xs font-mono text-stone-400 leading-relaxed">
+                        Inter · 400 · 0.875–1rem/1.6<br/>tracking-normal
+                    </div>
+                </div>
+                <!-- Body Small / Caption -->
+                <div class="grid grid-cols-1 md:grid-cols-12 border-b border-stone-300 p-8 md:p-12 items-baseline reveal">
+                    <div class="col-span-3 text-xs font-mono text-stone-400 uppercase tracking-widest mb-4 md:mb-0">Body Small / Caption</div>
+                    <div class="col-span-6">
+                        <p class="text-xs text-stone-500 leading-relaxed">Redesign minimalista de vitrine focado em storytelling de marca e fotografia imersiva de produto.</p>
+                    </div>
+                    <div class="col-span-3 text-right text-xs font-mono text-stone-400 leading-relaxed">
+                        Inter · 400 · 0.75rem/1.5<br/>tracking-normal
+                    </div>
+                </div>
+                <!-- Label / Mono -->
+                <div class="grid grid-cols-1 md:grid-cols-12 p-8 md:p-12 items-baseline reveal">
+                    <div class="col-span-3 text-xs font-mono text-stone-400 uppercase tracking-widest mb-4 md:mb-0">Label / Mono</div>
+                    <div class="col-span-6">
+                        <span class="text-xs font-mono uppercase tracking-widest text-stone-500">Currently available for Q4 2026</span>
+                    </div>
+                    <div class="col-span-3 text-right text-xs font-mono text-stone-400 leading-relaxed">
+                        font-mono · 500 · 0.75rem/1<br/>tracking-widest · UPPERCASE
+                    </div>
+                </div>
+            </div>
+
+            <!-- Letter-by-letter reveal demo (animação de surgimento aplicada à tipografia) -->
+            <div class="p-8 md:p-12 border-t border-stone-300 text-center relative z-10 reveal">
+                <span class="text-xs font-mono text-stone-400 block mb-8 uppercase tracking-widest">Clip Letter Reveal — hover / scroll trigger</span>
+                <h2 class="clip-letters text-6xl md:text-8xl font-semibold tracking-tighter leading-none text-stone-900" id="clip-demo">
+                    <span style="animation-delay:.02s">A</span><span style="animation-delay:.06s">n</span><span style="animation-delay:.10s">i</span><span style="animation-delay:.14s">m</span><span style="animation-delay:.18s">a</span><span style="animation-delay:.22s">t</span><span style="animation-delay:.26s">i</span><span style="animation-delay:.30s">o</span><span style="animation-delay:.34s">n</span>
+                </h2>
+            </div>
+        </section>
+
+        <!-- ============================== 2) COLORS & SURFACES ============================== -->
+        <section id="colors" class="relative z-10 border-b border-stone-300">
+            <div class="fold-header reveal">
+                <span class="text-xs font-mono uppercase text-stone-500 block mb-2">02 / Fundamentos</span>
+                <h2 class="text-4xl font-medium tracking-tight">Cores & Superfícies</h2>
+            </div>
+
+            <!-- Core palette swatches -->
+            <div class="grid grid-cols-2 md:grid-cols-4">
+                <div class="col-span-1 p-8 md:p-10 border-r border-b border-stone-300 bg-[#EAEAE5] flex flex-col justify-between aspect-square reveal">
+                    <div class="text-stone-900 font-bold text-sm">Surface / Main</div>
+                    <div class="font-mono text-[11px] text-stone-500 leading-relaxed">#EAEAE5<br/>rgb(234,234,229)<br/>hsl(60,7%,91%)</div>
+                </div>
+                <div class="col-span-1 p-8 md:p-10 border-r border-b border-stone-300 bg-stone-900 flex flex-col justify-between aspect-square reveal delay-100">
+                    <div class="text-white font-bold text-sm">Primary / Ink</div>
+                    <div class="font-mono text-[11px] text-stone-400 leading-relaxed">#1C1917<br/>rgb(28,25,23)<br/>hsl(24,9%,10%)</div>
+                </div>
+                <div class="col-span-1 p-8 md:p-10 border-r border-b border-stone-300 bg-stone-500 flex flex-col justify-between aspect-square reveal delay-200">
+                    <div class="text-white font-bold text-sm">Secondary</div>
+                    <div class="font-mono text-[11px] text-stone-200 leading-relaxed">#78716C<br/>rgb(120,113,108)<br/>hsl(24,6%,45%)</div>
+                </div>
+                <div class="col-span-1 p-8 md:p-10 border-b border-stone-300 bg-stone-300 flex flex-col justify-between aspect-square reveal delay-300">
+                    <div class="text-stone-800 font-bold text-sm">Border / Neutral</div>
+                    <div class="font-mono text-[11px] text-stone-600 leading-relaxed">#D6D3D1<br/>rgb(214,211,209)<br/>hsl(24,6%,83%)</div>
+                </div>
+                <div class="col-span-1 p-8 md:p-10 border-r border-stone-300 bg-white flex flex-col justify-between aspect-square reveal delay-100">
+                    <div class="text-stone-900 font-bold text-sm">Surface / Elevated</div>
+                    <div class="font-mono text-[11px] text-stone-500 leading-relaxed">#FFFFFF<br/>rgb(255,255,255)<br/>hsl(0,0%,100%)</div>
+                </div>
+                <div class="col-span-1 p-8 md:p-10 border-r border-stone-300 bg-stone-200 flex flex-col justify-between aspect-square reveal delay-200">
+                    <div class="text-stone-900 font-bold text-sm">Surface / Muted</div>
+                    <div class="font-mono text-[11px] text-stone-500 leading-relaxed">#E7E5E4<br/>rgb(231,229,228)<br/>hsl(30,5%,90%)</div>
+                </div>
+                <!-- Decorative accent — used only as exception, never dominant -->
+                <div class="col-span-1 p-8 md:p-10 border-r border-stone-300 bg-gradient-to-br from-stone-900 to-stone-700 flex flex-col justify-between aspect-square reveal delay-300">
+                    <div class="text-white font-bold text-sm">Gradient / Overlay</div>
+                    <div class="font-mono text-[11px] text-stone-300 leading-relaxed">linear-gradient(135deg,<br/>#1C1917 → #44403C)</div>
+                </div>
+                <div class="col-span-1 p-8 md:p-10 bg-stone-950 flex flex-col justify-between aspect-square relative overflow-hidden reveal delay-400">
+                    <div class="absolute inset-0" style="background:radial-gradient(circle at 30% 30%, rgba(255,255,255,0.15), transparent 60%)"></div>
+                    <div class="text-white font-bold text-sm relative">Glow / Ambient</div>
+                    <div class="font-mono text-[11px] text-stone-400 leading-relaxed relative">radial-gradient white/10<br/>→ transparent (orbs)</div>
+                </div>
+            </div>
+
+            <!-- Opacity ramp -->
+            <div class="p-8 md:p-12 border-t border-stone-300 reveal">
+                <h3 class="text-sm font-bold uppercase tracking-widest text-stone-900 mb-6">Variantes de Opacidade — Stone 900</h3>
+                <div class="flex gap-3 flex-wrap">
+                    <div class="w-20 h-20 rounded-md bg-stone-900 flex items-end p-2"><span class="text-[10px] font-mono text-white">100%</span></div>
+                    <div class="w-20 h-20 rounded-md bg-stone-900/80 flex items-end p-2"><span class="text-[10px] font-mono text-white">80%</span></div>
+                    <div class="w-20 h-20 rounded-md bg-stone-900/60 flex items-end p-2"><span class="text-[10px] font-mono text-white">60%</span></div>
+                    <div class="w-20 h-20 rounded-md bg-stone-900/40 flex items-end p-2"><span class="text-[10px] font-mono text-stone-900">40%</span></div>
+                    <div class="w-20 h-20 rounded-md bg-stone-900/20 flex items-end p-2"><span class="text-[10px] font-mono text-stone-900">20%</span></div>
+                    <div class="w-20 h-20 rounded-md bg-stone-900/10 border border-stone-300 flex items-end p-2"><span class="text-[10px] font-mono text-stone-900">10%</span></div>
+                </div>
+            </div>
+
+            <!-- Semantic roles -->
+            <div class="border-t border-stone-300 p-8 md:p-12 reveal">
+                <h3 class="text-sm font-bold uppercase tracking-widest text-stone-900 mb-8">Papéis Semânticos & Uso Contextual</h3>
+                <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm border-collapse min-w-[720px]">
+                    <thead>
+                        <tr class="text-xs font-mono uppercase tracking-widest text-stone-400 border-b border-stone-300">
+                            <th class="py-3 pr-4">Papel</th>
+                            <th class="py-3 pr-4">Token</th>
+                            <th class="py-3 pr-4">Uso — texto / fundo / borda</th>
+                            <th class="py-3 pr-4">Hover / Active / Disabled</th>
+                            <th class="py-3">Contraste</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-stone-300">
+                        <tr>
+                            <td class="py-4 pr-4 font-medium">Primary</td>
+                            <td class="py-4 pr-4"><span class="inline-block w-3 h-3 rounded-full bg-stone-900 mr-2 align-middle"></span>stone-900</td>
+                            <td class="py-4 pr-4 text-stone-600">Texto principal / CTA sólido / borda de foco</td>
+                            <td class="py-4 pr-4 text-stone-600">hover: stone-700 · active: stone-950 · disabled: stone-400</td>
+                            <td class="py-4 text-stone-600">AAA em #EAEAE5</td>
+                        </tr>
+                        <tr>
+                            <td class="py-4 pr-4 font-medium">Secondary</td>
+                            <td class="py-4 pr-4"><span class="inline-block w-3 h-3 rounded-full bg-stone-500 mr-2 align-middle"></span>stone-500</td>
+                            <td class="py-4 pr-4 text-stone-600">Texto de apoio / metadados / ícones inativos</td>
+                            <td class="py-4 pr-4 text-stone-600">hover: stone-800 · disabled: stone-300</td>
+                            <td class="py-4 text-stone-600">AA em #EAEAE5</td>
+                        </tr>
+                        <tr>
+                            <td class="py-4 pr-4 font-medium">Neutral / Border</td>
+                            <td class="py-4 pr-4"><span class="inline-block w-3 h-3 rounded-full bg-stone-300 mr-2 align-middle border border-stone-400"></span>stone-300</td>
+                            <td class="py-4 pr-4 text-stone-600">Divisores / bordas de card / grid guides</td>
+                            <td class="py-4 pr-4 text-stone-600">hover: stone-900 (em cards interativos)</td>
+                            <td class="py-4 text-stone-600">Decorativo — não requer AA</td>
+                        </tr>
+                        <tr>
+                            <td class="py-4 pr-4 font-medium">Accent / Decorative</td>
+                            <td class="py-4 pr-4"><span class="inline-block w-3 h-3 rounded-full bg-white border border-stone-400 mr-2 align-middle"></span>white / glow</td>
+                            <td class="py-4 pr-4 text-stone-600">Glow orbs, beam rings, lettering transparente (mix-blend-difference)</td>
+                            <td class="py-4 pr-4 text-stone-600">só em hover / animação — nunca estático em texto</td>
+                            <td class="py-4 text-stone-600">N/A (efeito, não texto)</td>
+                        </tr>
+                        <tr>
+                            <td class="py-4 pr-4 font-medium">Feedback / Success</td>
+                            <td class="py-4 pr-4"><span class="inline-block w-3 h-3 rounded-full bg-emerald-500 mr-2 align-middle"></span>emerald-500</td>
+                            <td class="py-4 pr-4 text-stone-600">Status "live", badges de confirmação</td>
+                            <td class="py-4 pr-4 text-stone-600">pulse animado em indicadores</td>
+                            <td class="py-4 text-stone-600">AA em branco</td>
+                        </tr>
+                        <tr>
+                            <td class="py-4 pr-4 font-medium">Feedback / Error</td>
+                            <td class="py-4 pr-4"><span class="inline-block w-3 h-3 rounded-full bg-red-500 mr-2 align-middle"></span>red-500</td>
+                            <td class="py-4 pr-4 text-stone-600">Validação de formulário, estados destrutivos</td>
+                            <td class="py-4 pr-4 text-stone-600">hover: red-600</td>
+                            <td class="py-4 text-stone-600">AA em branco</td>
+                        </tr>
+                        <tr>
+                            <td class="py-4 pr-4 font-medium">Feedback / Warning</td>
+                            <td class="py-4 pr-4"><span class="inline-block w-3 h-3 rounded-full bg-amber-500 mr-2 align-middle"></span>amber-500</td>
+                            <td class="py-4 pr-4 text-stone-600">Alertas não-críticos</td>
+                            <td class="py-4 pr-4 text-stone-600">hover: amber-600</td>
+                            <td class="py-4 text-stone-600">AA em stone-900</td>
+                        </tr>
+                        <tr>
+                            <td class="py-4 pr-4 font-medium">Feedback / Info</td>
+                            <td class="py-4 pr-4"><span class="inline-block w-3 h-3 rounded-full bg-sky-500 mr-2 align-middle"></span>sky-500</td>
+                            <td class="py-4 pr-4 text-stone-600">Dicas contextuais, badges informativos</td>
+                            <td class="py-4 pr-4 text-stone-600">hover: sky-600</td>
+                            <td class="py-4 text-stone-600">AA em branco</td>
+                        </tr>
+                    </tbody>
+                </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================== 3) UI COMPONENTS ============================== -->
+        <section id="components" class="relative z-10 border-b border-stone-300 bg-schematic overflow-hidden">
+            <div class="glow-orb w-[340px] h-[340px] bg-stone-300/40 top-1/3 -left-24 pointer-events-none"></div>
+
+            <div class="fold-header reveal">
+                <span class="text-xs font-mono uppercase text-stone-500 block mb-2">03 / UI Elements</span>
+                <h2 class="text-4xl font-medium tracking-tight">Componentes</h2>
+            </div>
+
+            <!-- Buttons -->
+            <div class="grid grid-cols-1 md:grid-cols-2 relative z-10">
+                <div class="p-8 md:p-12 border-b md:border-b-0 md:border-r border-stone-300 reveal">
+                    <h3 class="text-sm font-bold uppercase tracking-widest text-stone-900 mb-8">Botões & Ações</h3>
+                    <div class="space-y-8">
+                        <div class="flex items-center gap-4 flex-wrap">
+                            <button class="px-6 py-3 bg-stone-900 text-white rounded-md text-sm font-medium hover:bg-stone-700 active:bg-stone-950 transition-all flex items-center gap-2 group">
+                                Ação Primária
+                                <iconify-icon class="text-lg group-hover:translate-y-1 transition-transform" icon="solar:file-download-linear"></iconify-icon>
+                            </button>
+                            <span class="text-xs font-mono text-stone-400">.bg-stone-900 · rounded-md</span>
+                        </div>
+
+                        <div class="flex items-center gap-4 flex-wrap">
+                            <a class="beam-btn text-stone-900" href="#">
+                                <span class="beam-ring"></span>
+                                <span class="beam-face flex items-center gap-2 rounded-full bg-white px-8 py-3 ring-1 ring-stone-900/10">
+                                    <span class="beam-sweep"><span></span></span>
+                                    <span class="relative z-10 text-sm font-medium tracking-wide">Beam Glow</span>
+                                    <iconify-icon class="relative z-10 text-lg" icon="solar:arrow-right-linear"></iconify-icon>
+                                </span>
+                            </a>
+                            <span class="text-xs font-mono text-stone-400">.beam-btn (conic + shimmer)</span>
+                        </div>
+
+                        <div class="flex items-center gap-4 flex-wrap">
+                            <a class="inline-flex items-center gap-2 text-sm font-medium uppercase tracking-widest border border-stone-900 rounded-full px-8 py-3 hover:bg-stone-900 hover:text-white transition-all" href="#">
+                                Ação Secundária
+                                <iconify-icon class="text-lg" icon="solar:arrow-right-linear"></iconify-icon>
+                            </a>
+                            <span class="text-xs font-mono text-stone-400">outline · rounded-full</span>
+                        </div>
+
+                        <div class="flex items-center gap-4 flex-wrap">
+                            <a class="text-sm font-medium text-stone-600 hover:text-stone-900 border-b border-stone-400 hover:border-stone-900 pb-0.5 transition-colors" href="#">Link de Texto</a>
+                            <button disabled class="px-6 py-3 bg-stone-200 text-stone-400 rounded-md text-sm font-medium cursor-not-allowed">Desabilitado</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Inputs -->
+                <div class="p-8 md:p-12 reveal delay-100">
+                    <h3 class="text-sm font-bold uppercase tracking-widest text-stone-900 mb-8">Inputs</h3>
+                    <div class="space-y-6 max-w-sm">
+                        <div>
+                            <label class="text-xs font-mono uppercase tracking-widest text-stone-500 block mb-2">Text Input</label>
+                            <input class="w-full bg-white border border-stone-300 rounded-md px-4 py-3 text-sm text-stone-900 placeholder:text-stone-400 outline-none focus:border-stone-900 focus:ring-2 focus:ring-stone-900/10 transition-all" placeholder="nome@estudio.com" type="text" />
+                        </div>
+                        <div>
+                            <label class="text-xs font-mono uppercase tracking-widest text-stone-500 block mb-2">Textarea</label>
+                            <textarea class="w-full bg-white border border-stone-300 rounded-md px-4 py-3 text-sm text-stone-900 placeholder:text-stone-400 outline-none focus:border-stone-900 focus:ring-2 focus:ring-stone-900/10 transition-all resize-none" placeholder="Conte sobre o projeto..." rows="3"></textarea>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <label class="text-xs font-mono uppercase tracking-widest text-stone-500 flex items-center gap-3 cursor-pointer" onclick="this.querySelector('.ds-checkbox').classList.toggle('checked')">
+                                <svg class="ds-checkbox w-5 h-5" viewbox="0 0 20 20">
+                                    <rect class="box-fill" height="16" rx="4" stroke="#78716c" stroke-width="1.5" width="16" x="2" y="2" fill="white"></rect>
+                                    <path class="check-path" d="M6 10l2.5 2.5L14 7" fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+                                </svg>
+                                Aceitar termos
+                            </label>
+                            <div class="ds-toggle" onclick="this.classList.toggle('on')"><div class="knob"></div></div>
+                        </div>
+                        <div>
+                            <label class="text-xs font-mono uppercase tracking-widest text-stone-500 block mb-2">Select</label>
+                            <select class="w-full bg-white border border-stone-300 rounded-md px-4 py-3 text-sm text-stone-900 outline-none focus:border-stone-900 transition-all">
+                                <option>Design de Produto</option>
+                                <option>Design System</option>
+                                <option>Motion & Interação</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Badges & Tooltips -->
+            <div class="grid grid-cols-1 md:grid-cols-2 border-t border-stone-300">
+                <div class="p-8 md:p-12 border-b md:border-b-0 md:border-r border-stone-300 reveal">
+                    <h3 class="text-sm font-bold uppercase tracking-widest text-stone-900 mb-8">Badges</h3>
+                    <div class="flex flex-wrap items-center gap-4">
+                        <div class="bg-stone-900 p-3 rounded-md"><span class="px-3 py-1 border border-white/40 rounded-full text-xs font-mono uppercase backdrop-blur-md text-white">Glass Badge</span></div>
+                        <span class="px-3 py-1 border border-stone-900 rounded-full text-xs font-mono uppercase text-stone-900">Outline</span>
+                        <span class="px-3 py-1 bg-stone-200 rounded-full text-xs font-mono uppercase text-stone-700">Neutral</span>
+                        <span class="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs font-mono uppercase flex items-center gap-1.5"><span class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>Online</span>
+                        <span class="px-3 py-1 bg-red-100 text-red-700 rounded-full text-xs font-mono uppercase">Erro</span>
+                    </div>
+                </div>
+                <div class="p-8 md:p-12 reveal delay-100">
+                    <h3 class="text-sm font-bold uppercase tracking-widest text-stone-900 mb-8">Tooltip</h3>
+                    <div class="flex items-center gap-10">
+                        <div class="tooltip-trigger relative inline-flex">
+                            <button class="w-11 h-11 rounded-full bg-stone-900 text-white flex items-center justify-center"><iconify-icon icon="solar:info-circle-linear"></iconify-icon></button>
+                            <div class="tooltip-box bottom-full left-1/2 -translate-x-1/2 mb-3 bg-stone-900 text-white text-xs font-mono px-3 py-2 rounded-md whitespace-nowrap">Elastic ease · 0.3s</div>
+                        </div>
+                        <span class="text-xs font-mono text-stone-400">hover no ícone →</span>
+                    </div>
+
+                    <h3 class="text-sm font-bold uppercase tracking-widest text-stone-900 mb-6 mt-10">Modal</h3>
+                    <button onclick="document.getElementById('ds-modal').classList.remove('hidden-modal')" class="px-6 py-3 border border-stone-900 rounded-md text-sm font-medium hover:bg-stone-900 hover:text-white transition-all">Abrir Modal</button>
+                </div>
+            </div>
+
+            <!-- Cards: flashlight + project split cards -->
+            <div class="border-t border-stone-300 relative z-10">
+                <div class="p-8 md:p-12 pb-0">
+                    <h3 class="text-sm font-bold uppercase tracking-widest text-stone-900 mb-8 reveal">Cards</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                        <div class="flashlight-card relative aspect-square border border-stone-300 bg-white rounded-lg p-6 flex flex-col justify-end group overflow-hidden reveal" data-flashlight>
+                            <iconify-icon class="text-4xl text-stone-400 mb-4 group-hover:text-stone-900 transition-colors duration-500" icon="solar:layers-minimalistic-linear"></iconify-icon>
+                            <div class="text-sm text-stone-600 font-medium relative z-10">Flashlight Card</div>
+                            <div class="text-xs text-stone-400 font-mono relative z-10">passe o mouse</div>
+                        </div>
+                        <div class="flashlight-card flashlight-card-dark relative aspect-square border border-stone-900 bg-stone-900 rounded-lg p-6 flex flex-col justify-end group overflow-hidden reveal delay-100" data-flashlight>
+                            <iconify-icon class="text-4xl text-stone-500 mb-4 group-hover:text-white transition-colors duration-500" icon="solar:cpu-bold-linear"></iconify-icon>
+                            <div class="text-sm text-stone-300 font-medium relative z-10">Dark Surface</div>
+                            <div class="text-xs text-stone-500 font-mono relative z-10">radial glow branco</div>
+                        </div>
+                        <div class="relative aspect-square border border-stone-300 rounded-lg p-6 flex flex-col justify-end group overflow-hidden reveal delay-200 bg-stone-100">
+                            <div class="absolute top-4 right-4 text-xs font-mono text-stone-400">.reveal</div>
+                            <iconify-icon class="text-4xl text-stone-400 mb-4 group-hover:scale-110 group-hover:text-stone-900 transition-all duration-500" icon="solar:magic-stick-3-linear"></iconify-icon>
+                            <div class="text-sm text-stone-600 font-medium">Scale on Hover</div>
+                            <div class="text-xs text-stone-400 font-mono">group-hover:scale-110</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project split card ×3 -->
+                <div class="group border-y border-stone-300 bg-[#EAEAE5] hover:bg-white transition-colors duration-500 cursor-pointer overflow-hidden reveal">
+                    <div class="grid grid-cols-1 md:grid-cols-12 min-h-[220px]">
+                        <div class="col-span-1 md:col-span-5 p-8 md:p-12 border-r border-stone-300/0 md:border-stone-300 flex flex-col justify-center">
+                            <div class="flex items-center gap-3 mb-4">
+                                <span class="text-xs font-mono text-stone-500">01</span>
+                                <div class="h-px w-8 bg-stone-300"></div>
+                                <span class="text-xs font-bold uppercase tracking-wider text-stone-900">Fintech</span>
+                            </div>
+                            <h4 class="text-3xl md:text-4xl font-medium tracking-tight mb-4 group-hover:translate-x-2 transition-transform duration-500">Nova Finance</h4>
+                            <p class="text-stone-500 text-sm leading-relaxed max-w-sm">Card com imagem que revela cor no hover (grayscale → color) e título que desliza.</p>
+                        </div>
+                        <div class="col-span-7 hidden md:block relative overflow-hidden">
+                            <div class="absolute inset-0 bg-stone-100 flex items-center justify-center p-8">
+                                <img class="w-full h-full object-cover grayscale opacity-80 group-hover:scale-105 group-hover:grayscale-0 transition-all duration-700" src="digital-architect.aura.build/assets/4b7d31e6-5b45-47eb-9853-96bbb9_bf1aa5f9d2cf.webp" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="group border-b border-stone-300 bg-[#EAEAE5] hover:bg-white transition-colors duration-500 cursor-pointer overflow-hidden reveal">
+                    <div class="grid grid-cols-1 md:grid-cols-12 min-h-[220px]">
+                        <div class="col-span-1 md:col-span-5 p-8 md:p-12 border-r border-stone-300/0 md:border-stone-300 flex flex-col justify-center">
+                            <div class="flex items-center gap-3 mb-4">
+                                <span class="text-xs font-mono text-stone-500">02</span>
+                                <div class="h-px w-8 bg-stone-300"></div>
+                                <span class="text-xs font-bold uppercase tracking-wider text-stone-900">SaaS</span>
+                            </div>
+                            <h4 class="text-3xl md:text-4xl font-medium tracking-tight mb-4 group-hover:translate-x-2 transition-transform duration-500">Orbit Systems</h4>
+                            <p class="text-stone-500 text-sm leading-relaxed max-w-sm">Biblioteca de componentes unificada para dashboard multi-tenant de analytics.</p>
+                        </div>
+                        <div class="col-span-7 hidden md:block relative overflow-hidden">
+                            <div class="absolute inset-0 bg-stone-100 flex items-center justify-center p-8">
+                                <img class="w-full h-full object-cover grayscale opacity-80 group-hover:scale-105 group-hover:grayscale-0 transition-all duration-700" src="digital-architect.aura.build/assets/5ea5c0e9-3047-467a-9eaf-e49f65_6a6f021d85c6.webp" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="group border-b border-stone-300 bg-[#EAEAE5] hover:bg-white transition-colors duration-500 cursor-pointer overflow-hidden reveal">
+                    <div class="grid grid-cols-1 md:grid-cols-12 min-h-[220px]">
+                        <div class="col-span-1 md:col-span-5 p-8 md:p-12 border-r border-stone-300/0 md:border-stone-300 flex flex-col justify-center">
+                            <div class="flex items-center gap-3 mb-4">
+                                <span class="text-xs font-mono text-stone-500">03</span>
+                                <div class="h-px w-8 bg-stone-300"></div>
+                                <span class="text-xs font-bold uppercase tracking-wider text-stone-900">E-commerce</span>
+                            </div>
+                            <h4 class="text-3xl md:text-4xl font-medium tracking-tight mb-4 group-hover:translate-x-2 transition-transform duration-500">Canvas Supply</h4>
+                            <p class="text-stone-500 text-sm leading-relaxed max-w-sm">Vitrine minimalista com foco em storytelling e fotografia imersiva de produto.</p>
+                        </div>
+                        <div class="col-span-7 hidden md:block relative overflow-hidden">
+                            <div class="absolute inset-0 bg-stone-100 flex items-center justify-center p-8">
+                                <img class="w-full h-full object-cover grayscale opacity-80 group-hover:scale-105 group-hover:grayscale-0 transition-all duration-700" src="digital-architect.aura.build/assets/ddab06d9-9060-42a5-9052-32121a_7062a2506669.webp" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navbar spec -->
+            <div class="border-t border-stone-300 p-8 md:p-12 reveal">
+                <h3 class="text-sm font-bold uppercase tracking-widest text-stone-900 mb-6">Navbar</h3>
+                <p class="text-sm text-stone-500 mb-6 max-w-lg leading-relaxed">Sticky top, fundo semitransparente com blur, entra com <code class="font-mono text-xs bg-stone-200 px-1.5 py-0.5 rounded">.nav-load</code> (translateY -10px → 0, 0.8s ease-out) ao carregar a página. Ver cabeçalho desta página como instância viva.</p>
+                <div class="flex items-center justify-between px-4 py-3 border border-stone-300 rounded-md bg-[#EAEAE5]/90 backdrop-blur-md max-w-xl">
+                    <span class="text-xs font-mono uppercase tracking-widest text-stone-500">Logo</span>
+                    <div class="flex gap-6">
+                        <span class="text-xs font-medium tracking-widest uppercase text-stone-900">Link</span>
+                        <span class="text-xs font-medium tracking-widest uppercase text-stone-400">Link</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================== 4) ICONS ============================== -->
+        <section id="icons" class="relative z-10 border-b border-stone-300">
+            <div class="fold-header reveal">
+                <span class="text-xs font-mono uppercase text-stone-500 block mb-2">04 / Assets</span>
+                <h2 class="text-4xl font-medium tracking-tight">Iconografia</h2>
+                <p class="text-sm text-stone-500 mt-3 max-w-xl leading-relaxed">Biblioteca <strong class="text-stone-800">Solar (linear)</strong> via web component <code class="font-mono text-xs bg-stone-200 px-1.5 py-0.5 rounded">&lt;iconify-icon&gt;</code>. Grid 24px, peso visual consistente, hover com leve rotação ou escala.</p>
+            </div>
+
+            <div class="p-8 md:p-12">
+                <h4 class="text-xs font-mono uppercase tracking-widest text-stone-400 mb-6">Navegação & Marca</h4>
+                <div class="grid grid-cols-3 md:grid-cols-6 gap-6 mb-12">
+                    <div class="flex flex-col items-center gap-3 group reveal"><iconify-icon class="text-3xl text-stone-800 group-hover:rotate-180 transition-transform duration-700" icon="solar:atom-linear"></iconify-icon><span class="text-[10px] font-mono text-stone-500">atom</span></div>
+                    <div class="flex flex-col items-center gap-3 group reveal delay-100"><iconify-icon class="text-3xl text-stone-800 group-hover:-translate-y-1 transition-transform" icon="solar:layers-minimalistic-linear"></iconify-icon><span class="text-[10px] font-mono text-stone-500">layers</span></div>
+                    <div class="flex flex-col items-center gap-3 group reveal delay-200"><iconify-icon class="text-3xl text-stone-800 group-hover:-translate-y-1 transition-transform" icon="solar:palette-linear"></iconify-icon><span class="text-[10px] font-mono text-stone-500">palette</span></div>
+                    <div class="flex flex-col items-center gap-3 group reveal delay-300"><iconify-icon class="text-3xl text-stone-800 group-hover:-translate-y-1 transition-transform" icon="solar:globe-linear"></iconify-icon><span class="text-[10px] font-mono text-stone-500">globe</span></div>
+                    <div class="flex flex-col items-center gap-3 group reveal delay-400"><iconify-icon class="text-3xl text-stone-800 group-hover:-translate-y-1 transition-transform" icon="solar:cup-star-linear"></iconify-icon><span class="text-[10px] font-mono text-stone-500">cup-star</span></div>
+                    <div class="flex flex-col items-center gap-3 group reveal delay-500"><iconify-icon class="text-3xl text-stone-800 group-hover:-translate-y-1 transition-transform" icon="solar:clock-circle-linear"></iconify-icon><span class="text-[10px] font-mono text-stone-500">clock</span></div>
+                </div>
+
+                <h4 class="text-xs font-mono uppercase tracking-widest text-stone-400 mb-6">Ações</h4>
+                <div class="grid grid-cols-3 md:grid-cols-6 gap-6 mb-12">
+                    <div class="flex flex-col items-center gap-3 group reveal"><iconify-icon class="text-3xl text-stone-800 group-hover:translate-x-1 transition-transform" icon="solar:arrow-right-linear"></iconify-icon><span class="text-[10px] font-mono text-stone-500">arrow-right</span></div>
+                    <div class="flex flex-col items-center gap-3 group reveal delay-100"><iconify-icon class="text-3xl text-stone-800 group-hover:translate-y-1 transition-transform" icon="solar:arrow-down-linear"></iconify-icon><span class="text-[10px] font-mono text-stone-500">arrow-down</span></div>
+                    <div class="flex flex-col items-center gap-3 group reveal delay-200"><iconify-icon class="text-3xl text-stone-800 group-hover:-translate-y-1 group-hover:translate-x-1 transition-transform" icon="solar:arrow-right-up-linear"></iconify-icon><span class="text-[10px] font-mono text-stone-500">arrow-up-right</span></div>
+                    <div class="flex flex-col items-center gap-3 group reveal delay-300"><iconify-icon class="text-3xl text-stone-800 group-hover:translate-y-1 transition-transform" icon="solar:file-download-linear"></iconify-icon><span class="text-[10px] font-mono text-stone-500">download</span></div>
+                    <div class="flex flex-col items-center gap-3 group reveal delay-400"><iconify-icon class="text-3xl text-stone-800 group-hover:scale-110 transition-transform" icon="solar:magic-stick-3-linear"></iconify-icon><span class="text-[10px] font-mono text-stone-500">magic</span></div>
+                    <div class="flex flex-col items-center gap-3 group reveal delay-500"><iconify-icon class="text-3xl text-stone-800 group-hover:scale-110 transition-transform" icon="solar:pen-new-square-linear"></iconify-icon><span class="text-[10px] font-mono text-stone-500">edit</span></div>
+                </div>
+
+                <h4 class="text-xs font-mono uppercase tracking-widest text-stone-400 mb-6">Status & Feedback</h4>
+                <div class="grid grid-cols-3 md:grid-cols-6 gap-6">
+                    <div class="flex flex-col items-center gap-3 reveal"><iconify-icon class="text-3xl text-emerald-600" icon="solar:check-circle-linear"></iconify-icon><span class="text-[10px] font-mono text-stone-500">success</span></div>
+                    <div class="flex flex-col items-center gap-3 reveal delay-100"><iconify-icon class="text-3xl text-red-500" icon="solar:close-circle-linear"></iconify-icon><span class="text-[10px] font-mono text-stone-500">error</span></div>
+                    <div class="flex flex-col items-center gap-3 reveal delay-200"><iconify-icon class="text-3xl text-amber-500" icon="solar:danger-triangle-linear"></iconify-icon><span class="text-[10px] font-mono text-stone-500">warning</span></div>
+                    <div class="flex flex-col items-center gap-3 reveal delay-300"><iconify-icon class="text-3xl text-sky-500" icon="solar:info-circle-linear"></iconify-icon><span class="text-[10px] font-mono text-stone-500">info</span></div>
+                    <div class="flex flex-col items-center gap-3 reveal delay-400"><iconify-icon class="text-3xl text-stone-400 [animation:spin_1.5s_linear_infinite]" icon="solar:refresh-linear"></iconify-icon><span class="text-[10px] font-mono text-stone-500">loading</span></div>
+                    <div class="flex flex-col items-center gap-3 reveal delay-500"><iconify-icon class="text-3xl text-stone-800" icon="solar:cpu-bold-linear"></iconify-icon><span class="text-[10px] font-mono text-stone-500">system</span></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================== 5) MOTION ============================== -->
+        <section id="motion" class="relative z-10 border-b border-stone-300 overflow-hidden bg-schematic">
+            <div class="glow-orb w-[360px] h-[360px] bg-stone-300/50 top-0 right-0 pointer-events-none"></div>
+
+            <div class="fold-header reveal">
+                <span class="text-xs font-mono uppercase text-stone-500 block mb-2">05 / Interação</span>
+                <h2 class="text-4xl font-medium tracking-tight">Motion & Animação</h2>
+                <p class="text-sm text-stone-500 mt-3 max-w-xl leading-relaxed">Todas as dobras deste sistema reutilizam este catálogo: <em>reveal</em> no scroll, <em>text-reveal</em> mascarado, glow ambiente, beam/shimmer em botões e parallax em imagens.</p>
+            </div>
+
+            <!-- Demo grid -->
+            <div class="p-8 md:p-12 grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10">
+                <div class="p-6 border border-stone-300 rounded-lg bg-white reveal">
+                    <span class="text-xs font-mono text-stone-400 block mb-2">.reveal</span>
+                    <h4 class="text-lg font-medium">Scroll Reveal</h4>
+                    <p class="text-xs text-stone-500 mt-2">opacity 0→1, translateY 2rem→0 · 1s cubic-bezier(0.16,1,.3,1)</p>
+                </div>
+                <div class="p-6 border border-stone-300 rounded-lg bg-white reveal delay-200">
+                    <span class="text-xs font-mono text-stone-400 block mb-2">.reveal .delay-200</span>
+                    <h4 class="text-lg font-medium">Staggered Reveal</h4>
+                    <p class="text-xs text-stone-500 mt-2">delays: 100/200/300/500/700/900ms</p>
+                </div>
+                <div class="p-6 border border-stone-300 rounded-lg bg-stone-900 text-white reveal delay-400 relative overflow-hidden group">
+                    <div class="glow-orb w-40 h-40 bg-white/20 -top-10 -right-10"></div>
+                    <span class="text-xs font-mono text-stone-400 block mb-2 relative">.glow-orb</span>
+                    <h4 class="text-lg font-medium relative">Ambient Glow</h4>
+                    <p class="text-xs text-stone-400 mt-2 relative">drift 14s + morph 10s ease-in-out infinite</p>
+                </div>
+
+                <div class="p-6 border border-stone-300 rounded-lg bg-white relative overflow-hidden group flashlight-card" data-flashlight>
+                    <span class="text-xs font-mono text-stone-400 block mb-2 relative z-10">.flashlight-card</span>
+                    <h4 class="text-lg font-medium relative z-10">Cursor Spotlight</h4>
+                    <p class="text-xs text-stone-500 mt-2 relative z-10">radial-gradient segue --mouse-x/--mouse-y</p>
+                </div>
+                <div class="p-6 border border-stone-300 rounded-lg bg-white flex flex-col justify-between reveal">
+                    <div>
+                        <span class="text-xs font-mono text-stone-400 block mb-2">.beam-btn</span>
+                        <h4 class="text-lg font-medium mb-4">Beam + Shimmer</h4>
+                    </div>
+                    <a class="beam-btn text-stone-900 self-start" href="#">
+                        <span class="beam-ring"></span>
+                        <span class="beam-face flex items-center gap-2 rounded-full bg-stone-100 px-5 py-2 ring-1 ring-stone-900/10">
+                            <span class="beam-sweep"><span></span></span>
+                            <span class="relative z-10 text-xs font-medium">hover aqui</span>
+                        </span>
+                    </a>
+                </div>
+                <div class="p-6 border border-stone-300 rounded-lg bg-white reveal delay-100">
+                    <span class="text-xs font-mono text-stone-400 block mb-2">.parallax-img</span>
+                    <h4 class="text-lg font-medium">Parallax Scroll</h4>
+                    <p class="text-xs text-stone-500 mt-2">translateY = scrollY × data-speed (0.03–0.1)</p>
+                </div>
+            </div>
+
+            <!-- Text reveal demo -->
+            <div class="p-8 md:p-12 border-t border-stone-300 text-center relative z-10 reveal">
+                <span class="text-xs font-mono text-stone-400 block mb-8 uppercase tracking-widest">Masked Text Reveal</span>
+                <h2 class="text-6xl md:text-8xl font-semibold tracking-tighter leading-none text-stone-900">
+                    <span class="text-reveal-wrapper"><span class="text-reveal-content">Movimento</span></span>
+                </h2>
+            </div>
+
+            <!-- Parallax Image Grid -->
+            <div class="grid grid-cols-2 md:grid-cols-4 border-t border-stone-300 h-[280px] overflow-hidden relative z-10">
+                <img class="w-full h-[130%] object-cover grayscale opacity-85 border-r border-stone-300 parallax-img" data-speed="0.05" src="digital-architect.aura.build/assets/ede50f82-0ad0-4579-a4ae-3a9428_fd09ad4bf2a1.jpg" />
+                <img class="w-full h-[130%] object-cover grayscale opacity-85 border-r border-stone-300 parallax-img" data-speed="0.08" src="digital-architect.aura.build/assets/e9d001f3-ebe3-45c2-b556-b53a55_6b8718ffa723.jpg" />
+                <img class="w-full h-[130%] object-cover grayscale opacity-85 border-r border-stone-300 parallax-img" data-speed="0.03" src="digital-architect.aura.build/assets/87e5e02b-a5b6-43ff-b9a4-5e299f_665111a88a86.jpg" />
+                <img class="w-full h-[130%] object-cover grayscale opacity-85 parallax-img" data-speed="0.1" src="digital-architect.aura.build/assets/2700a02e-2471-497e-8ca2-3196fc_50242a508302.webp" />
+            </div>
+        </section>
+
+        <!-- ============================== FOOTER ============================== -->
+        <footer class="relative z-10 bg-stone-900 text-stone-200 pt-24 pb-12 overflow-hidden">
+            <div class="glow-orb w-[500px] h-[500px] bg-white/5 top-0 left-1/3"></div>
+
+            <div class="px-6 md:px-12 mb-24 text-center relative reveal">
+                <h2 class="text-5xl md:text-7xl font-medium tracking-tighter mb-8 text-white">Construa com<br/>Sinal & Precisão.</h2>
+                <a class="beam-btn text-white inline-block" href="#hero-title">
+                    <span class="beam-ring"></span>
+                    <span class="beam-face flex items-center gap-2 rounded-full bg-transparent border border-stone-700 px-8 py-4 hover:bg-white hover:text-stone-900 transition-all duration-300">
+                        <span class="text-sm md:text-base font-medium">Voltar ao Topo</span>
+                    </span>
+                </a>
+            </div>
+
+            <div class="border-t border-stone-800 w-full mb-12"></div>
+
+            <div class="grid grid-cols-1 md:grid-cols-12 px-6 md:px-12 gap-12 md:gap-0 relative">
+                <div class="col-span-1 md:col-span-3">
+                    <div class="flex items-center gap-2 mb-6">
+                        <iconify-icon class="text-xl" icon="solar:atom-linear"></iconify-icon>
+                        <span class="font-bold tracking-tight text-lg">SIGNAL / SYSTEM</span>
+                    </div>
+                    <p class="text-stone-500 text-sm leading-relaxed max-w-[220px]">Sistema de design combinando tipografia mascarada, glow ambiente e micro-interações de precisão.</p>
+                </div>
+                <div class="col-span-1 md:col-span-3">
+                    <h4 class="text-xs font-mono uppercase text-stone-500 mb-6">Seções</h4>
+                    <ul class="space-y-3 text-sm font-medium">
+                        <li><a class="hover:text-white transition-colors" href="#typography">Typography</a></li>
+                        <li><a class="hover:text-white transition-colors" href="#colors">Colors</a></li>
+                        <li><a class="hover:text-white transition-colors" href="#components">Components</a></li>
+                        <li><a class="hover:text-white transition-colors" href="#motion">Motion</a></li>
+                    </ul>
+                </div>
+                <div class="col-span-1 md:col-span-3">
+                    <h4 class="text-xs font-mono uppercase text-stone-500 mb-6">Fontes</h4>
+                    <ul class="space-y-3 text-sm font-medium">
+                        <li class="flex items-center gap-2 text-stone-400">digital-architect.aura.build</li>
+                        <li class="flex items-center gap-2 text-stone-400">animations-gemini</li>
+                        <li class="flex items-center gap-2 text-stone-400">animations-gemini2</li>
+                    </ul>
+                </div>
+                <div class="col-span-1 md:col-span-3 flex flex-col justify-between h-full">
+                    <div class="text-right hidden md:block"><iconify-icon class="text-4xl text-stone-800" icon="solar:globe-linear"></iconify-icon></div>
+                    <div class="text-left md:text-right mt-4 md:mt-0">
+                        <span class="text-xs text-stone-600 block">© 2026 Signal / System.</span>
+                        <span class="text-xs text-stone-600">Design System v2.0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-24 text-center opacity-10 pointer-events-none select-none overflow-hidden">
+                <span class="text-[10rem] md:text-[18rem] font-bold leading-none tracking-tighter whitespace-nowrap">SIGNAL</span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- ============================== MODAL ============================== -->
+    <div id="ds-modal" class="hidden-modal fixed inset-0 z-[100] flex items-center justify-center p-6 bg-stone-950/60 backdrop-blur-sm">
+        <div class="modal-panel bg-white rounded-xl max-w-md w-full p-8 relative shadow-2xl">
+            <button onclick="document.getElementById('ds-modal').classList.add('hidden-modal')" class="absolute top-5 right-5 w-8 h-8 rounded-full hover:bg-stone-100 flex items-center justify-center transition-colors">
+                <iconify-icon class="text-lg" icon="solar:close-circle-linear"></iconify-icon>
+            </button>
+            <span class="text-xs font-mono uppercase tracking-widest text-stone-400 block mb-3">Modal Component</span>
+            <h3 class="text-2xl font-medium tracking-tight mb-3 text-stone-900">Elevação com escala elástica</h3>
+            <p class="text-sm text-stone-500 leading-relaxed mb-6">Backdrop com blur, painel entra com <code class="font-mono text-xs bg-stone-100 px-1.5 py-0.5 rounded">translateY(16px) scale(0.96) → 0</code> em easing elástico (0.4s).</p>
+            <button onclick="document.getElementById('ds-modal').classList.add('hidden-modal')" class="w-full px-6 py-3 bg-stone-900 text-white rounded-md text-sm font-medium hover:bg-stone-700 transition-all">Fechar</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // 1. Initial load animations
+            setTimeout(() => { document.querySelector('header').classList.add('loaded'); }, 100);
+            setTimeout(() => {
+                const heroTitle = document.getElementById('hero-title');
+                if (heroTitle) heroTitle.classList.add('reveal-active');
+            }, 400);
+            setTimeout(() => {
+                document.querySelectorAll('.hero-badge, .hero-stat').forEach(el => el.classList.add('active'));
+            }, 400);
+
+            // 2. Scroll reveal observer
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                        const textWrappers = entry.target.querySelectorAll('.text-reveal-wrapper');
+                        if (textWrappers.length > 0 || entry.target.classList.contains('text-reveal-wrapper')) {
+                            entry.target.classList.add('reveal-active');
+                        }
+                        if (entry.target.tagName === 'H1' || entry.target.tagName === 'H2') {
+                            entry.target.classList.add('reveal-active');
+                        }
+                        if (entry.target.classList.contains('clip-letters')) {
+                            entry.target.classList.add('active');
+                        }
+                    }
+                });
+            }, { root: null, rootMargin: '0px', threshold: 0.15 });
+
+            document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+            document.querySelectorAll('h1, h2').forEach(el => {
+                if (el.querySelector('.text-reveal-content')) observer.observe(el);
+            });
+            document.querySelectorAll('.clip-letters').forEach(el => observer.observe(el));
+
+            // 3. Hero carousel (ken-burns crossfade)
+            const slides = document.querySelectorAll('.carousel-slide');
+            let currentSlide = 0;
+            if (slides.length > 1) {
+                setInterval(() => {
+                    slides[currentSlide].classList.remove('active');
+                    currentSlide = (currentSlide + 1) % slides.length;
+                    slides[currentSlide].classList.add('active');
+                }, 5500);
+            }
+
+            // 4. Parallax on scroll
+            window.addEventListener('scroll', () => {
+                const scrolled = window.scrollY;
+                document.querySelectorAll('.parallax-img, .parallax-element').forEach((el) => {
+                    const speed = el.dataset.speed || 0.1;
+                    el.style.transform = `translateY(${scrolled * speed}px)`;
+                });
+            });
+
+            // 5. Flashlight cursor spotlight
+            document.querySelectorAll('[data-flashlight]').forEach((card) => {
+                card.addEventListener('mousemove', (e) => {
+                    const rect = card.getBoundingClientRect();
+                    card.style.setProperty('--mouse-x', `${e.clientX - rect.left}px`);
+                    card.style.setProperty('--mouse-y', `${e.clientY - rect.top}px`);
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Barbearia do Lirão — Cuidado Premium desde 2018</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ctext y=%27.9em%27 font-size=%2790%27%3E%F0%9F%92%88%3C/text%3E%3C/svg%3E" />
+
+    <!-- Tipografia: Oswald (headline condensada), Cormorant Garamond (acento itálico), Inter (corpo/UI) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600&family=Cormorant+Garamond:ital,wght@1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+
+    <!-- GSAP + ScrollTrigger (scroll-scrubbing do vídeo) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+    <link rel="stylesheet" href="assets/css/style.css" />
+</head>
+
+<body>
+
+    <!-- Atmosfera global: grain fino + vinheta quente (fixos, não bloqueiam clique) -->
+    <div class="grain-overlay" aria-hidden="true"></div>
+    <div class="vignette-overlay" aria-hidden="true"></div>
+
+    <!-- ============================== NAVBAR ============================== -->
+    <header class="nav" id="nav">
+        <a class="nav__logo" href="#">Barbearia <em>do Lirão</em></a>
+
+        <nav aria-label="Principal">
+            <ul class="nav__links">
+                <li><a href="#historia">Nossa História</a></li>
+                <li><a href="#servicos">Serviços</a></li>
+                <li><a href="#galeria">Galeria</a></li>
+                <li><a href="#barbeiros">Barbeiros</a></li>
+                <li><a href="#avaliacoes">Avaliações</a></li>
+            </ul>
+        </nav>
+
+        <div style="display:flex; align-items:center; gap:1rem;">
+            <a class="nav__cta" href="#agendar">Agendar Agora</a>
+            <button class="nav__burger" id="burger" aria-expanded="false" aria-controls="mobileMenu" aria-label="Abrir menu">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Menu mobile -->
+    <div class="mobile-menu" id="mobileMenu">
+        <a href="#historia"><span>Nossa História</span><span class="idx">01</span></a>
+        <a href="#servicos"><span>Serviços</span><span class="idx">02</span></a>
+        <a href="#galeria"><span>Galeria</span><span class="idx">03</span></a>
+        <a href="#barbeiros"><span>Barbeiros</span><span class="idx">04</span></a>
+        <a href="#avaliacoes"><span>Avaliações</span><span class="idx">05</span></a>
+        <a href="#agendar" style="color: var(--gold);"><span>Agendar Agora</span><span class="idx">→</span></a>
+    </div>
+
+    <!-- ============================== HERO ============================== -->
+    <section class="hero" id="hero">
+
+        <!-- Vídeo controlado pelo scroll (scrubbing). muted + playsinline
+             são obrigatórios para o fallback de autoplay em mobile. -->
+        <video class="hero__video" id="heroVideo"
+               src="assets/video/hero-scrub.mp4"
+               preload="auto" muted playsinline></video>
+
+        <div class="hero__grid" aria-hidden="true"></div>
+        <div class="hero__wash" aria-hidden="true"></div>
+
+        <!-- Glow ambiente dourado (.glow-orb do DS) atrás da headline —
+             luz quente e orgânica, como um bokeh de barbearia, nunca um
+             blob decorativo sem função. -->
+        <div class="glow-orb" aria-hidden="true" style="width:32rem;height:32rem;top:-10%;left:0;background:rgba(201,165,107,0.16);"></div>
+
+        <!-- Spotlight de cursor (.flashlight-card-dark do DS aplicado à cena) -->
+        <div class="hero__spot" id="heroSpot" aria-hidden="true"></div>
+
+        <div class="hero__content" id="heroContent">
+
+            <!-- Tag / eyebrow -->
+            <div class="hero__tag reveal delay-200">
+                <i class="rule" aria-hidden="true"></i>
+                <span>Fundada em 2018 — Cuidado Premium</span>
+            </div>
+
+            <!-- Headline: 3 linhas com masked reveal; a palavra de ênfase
+                 ganha um segundo camada de animação — .clip-letters do DS,
+                 reveal letra-a-letra que assenta logo depois da linha. -->
+            <h1 class="hero__title">
+                <span class="reveal-line"><span style="transition-delay:0.25s">O corte como</span></span>
+                <span class="reveal-line"><span style="transition-delay:0.4s">ofício. O detalhe</span></span>
+                <span class="reveal-line"><span style="transition-delay:0.55s">como <em class="clip-letters" id="ritualWord"><span style="animation-delay:.05s">r</span><span style="animation-delay:.10s">i</span><span style="animation-delay:.15s">t</span><span style="animation-delay:.20s">u</span><span style="animation-delay:.25s">a</span><span style="animation-delay:.30s">l</span><span style="animation-delay:.38s">.</span></em></span></span>
+            </h1>
+
+            <!-- Subheadline editorial -->
+            <p class="hero__sub reveal delay-600">
+                Na Barbearia do Lirão, cada cadeira é um convite ao tempo bem gasto:
+                técnica clássica, navalha afiada e a atenção de quem trata o corte
+                como assinatura — não como serviço de balcão.
+            </p>
+
+            <!-- Ações -->
+            <div class="hero__actions reveal delay-800">
+                <a class="beam-btn" href="#agendar">
+                    <span class="beam-ring" aria-hidden="true"></span>
+                    <span class="beam-face">
+                        <span class="beam-sweep" aria-hidden="true"><span></span></span>
+                        <span class="beam-label">Reserve sua Cadeira <span class="arrow" aria-hidden="true">→</span></span>
+                    </span>
+                </a>
+                <a class="btn-ghost" href="#servicos">
+                    Explorar Serviços <span class="arrow" aria-hidden="true">→</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Scroll cue -->
+        <div class="hero__cue reveal delay-800" aria-hidden="true">
+            <div class="dot">↓</div>
+            <span>Role para explorar</span>
+        </div>
+
+        <!-- Progresso do scrub -->
+        <div class="hero__progress" aria-hidden="true"><i id="progressBar"></i></div>
+    </section>
+
+    <!-- ============================== DOBRA 2 — NOSSO OFÍCIO ============================== -->
+    <section class="benefits" id="historia">
+        <div class="benefits__inner">
+
+            <!-- Fotografia real do ambiente + placa pendurada no canto -->
+            <div class="benefits__media reveal">
+                <div class="benefits__frame">
+                    <img class="benefits__img"
+                         src="assets/img/hero-ambiente.jpg"
+                         alt="Interior clássico da Barbearia do Lirão: poltrona de couro, espelho com iluminação quente e bancada de produtos de barba"
+                         loading="lazy" width="736" height="1030" />
+                </div>
+                <div class="benefits__badge" aria-hidden="true">
+                    <span class="benefits__badge-top">Barbearia do Lirão</span>
+                    <span class="benefits__badge-bottom">Est. 2018</span>
+                </div>
+            </div>
+
+            <!-- Texto persuasivo -->
+            <div class="benefits__content">
+                <div class="benefits__eyebrow reveal" style="transition-delay:.1s">
+                    <span class="num">02</span>
+                    <i class="rule" aria-hidden="true"></i>
+                    <span>Nosso Ofício</span>
+                </div>
+
+                <h2 class="benefits__title reveal" style="transition-delay:.2s">
+                    Ofício que não<br />passa de <em>moda.</em>
+                </h2>
+
+                <p class="benefits__lede reveal" style="transition-delay:.3s">
+                    Toalha quente, massagem facial, aroma de barba e um ambiente feito
+                    para você desacelerar — a cadeira do Lirão é onde a pressa fica de
+                    fora e o cuidado vira ritual.
+                </p>
+
+                <ul class="benefits__list">
+                    <li class="benefits__item reveal" style="transition-delay:.4s">
+                        <span class="benefits__item-num">01</span>
+                        <div class="benefits__item-body">
+                            <h3>Precisão que se vê no espelho</h3>
+                            <p>Cada linha, cada acabamento pensado para durar — e para impressionar.</p>
+                        </div>
+                    </li>
+                    <li class="benefits__item reveal" style="transition-delay:.5s">
+                        <span class="benefits__item-num">02</span>
+                        <div class="benefits__item-body">
+                            <h3>Sua imagem é nosso ofício</h3>
+                            <p>Barbeiros com décadas de prática, dedicados a entender seu estilo antes de tocar na tesoura.</p>
+                        </div>
+                    </li>
+                    <li class="benefits__item reveal" style="transition-delay:.6s">
+                        <span class="benefits__item-num">03</span>
+                        <div class="benefits__item-body">
+                            <h3>Um lugar, muitas gerações</h3>
+                            <p>Tradição de barbearia clássica com o conforto e o cuidado que o homem moderno merece.</p>
+                        </div>
+                    </li>
+                </ul>
+
+                <a class="btn-outline reveal" style="transition-delay:.7s" href="#servicos">
+                    Conhecer Nossos Serviços <span class="arrow" aria-hidden="true">→</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================== DOBRA 3 — NOSSOS SERVIÇOS ============================== -->
+    <section class="services" id="servicos">
+        <div class="services__inner">
+
+            <div class="services__header">
+                <div class="services__eyebrow reveal" style="transition-delay:.1s">
+                    <span class="num">03</span>
+                    <i class="rule" aria-hidden="true"></i>
+                    <span>Nossos Serviços</span>
+                </div>
+
+                <h2 class="services__title reveal" style="transition-delay:.2s">
+                    Escolha sua <em>experiência.</em>
+                </h2>
+
+                <p class="services__subtitle reveal" style="transition-delay:.3s">
+                    Cada serviço, uma tradição de precisão e cuidado.
+                </p>
+            </div>
+
+            <div class="services__grid">
+                <!-- 01 — Corte Clássico -->
+                <div class="service-card reveal" style="transition-delay:.1s">
+                    <div class="service-card__frame">
+                        <img class="service-card__img" src="assets/img/service-corte-classico.jpg" alt="Cadeira de barbearia clássica em ambiente vintage" loading="lazy" />
+                        <div class="service-card__tint" aria-hidden="true"></div>
+                    </div>
+                    <div class="service-card__body">
+                        <h3 class="service-card__name">Corte Clássico</h3>
+                        <div class="service-card__meta">
+                            <span class="service-card__price">R$ 60</span>
+                            <span class="service-card__duration">40 min</span>
+                        </div>
+                        <p class="service-card__tagline">Precisão que se vê no espelho — cada linha, cada acabamento, pensado para durar.</p>
+                        <a class="service-card__cta" href="#agendar">Agendar <span class="arrow" aria-hidden="true">→</span></a>
+                    </div>
+                </div>
+
+                <!-- 02 — Combo Corte + Barba -->
+                <div class="service-card reveal" style="transition-delay:.2s">
+                    <div class="service-card__frame">
+                        <img class="service-card__img" src="assets/img/service-combo.jpg" alt="Ambiente de barbearia clássica com poltronas vintage" loading="lazy" />
+                        <div class="service-card__tint" aria-hidden="true"></div>
+                    </div>
+                    <div class="service-card__body">
+                        <h3 class="service-card__name">Combo Corte + Barba</h3>
+                        <div class="service-card__meta">
+                            <span class="service-card__price">R$ 90</span>
+                            <span class="service-card__duration">60 min</span>
+                        </div>
+                        <p class="service-card__tagline">A experiência completa: corte impecável e barba desenhada em um só ritual.</p>
+                        <a class="service-card__cta" href="#agendar">Agendar <span class="arrow" aria-hidden="true">→</span></a>
+                    </div>
+                </div>
+
+                <!-- 03 — Shave Premium -->
+                <div class="service-card reveal" style="transition-delay:.3s">
+                    <div class="service-card__frame">
+                        <img class="service-card__img" src="assets/img/service-shave.jpg" alt="Barbeiro finalizando shave clássico com navalha e espuma" loading="lazy" style="object-position: 0% 50%;" />
+                        <div class="service-card__tint" aria-hidden="true"></div>
+                    </div>
+                    <div class="service-card__body">
+                        <h3 class="service-card__name">Shave Premium</h3>
+                        <div class="service-card__meta">
+                            <span class="service-card__price">R$ 50</span>
+                            <span class="service-card__duration">30 min</span>
+                        </div>
+                        <p class="service-card__tagline">Navalha, espuma quente e a arte do shave clássico, do jeito que sempre deveria ser.</p>
+                        <a class="service-card__cta" href="#agendar">Agendar <span class="arrow" aria-hidden="true">→</span></a>
+                    </div>
+                </div>
+
+                <!-- 04 — Acabamento de Precisão -->
+                <div class="service-card reveal" style="transition-delay:.4s">
+                    <div class="service-card__frame">
+                        <img class="service-card__img" src="assets/img/service-acabamento.jpg" alt="Close do acabamento de corte com tesoura na lateral da cabeça" loading="lazy" />
+                        <div class="service-card__tint" aria-hidden="true"></div>
+                    </div>
+                    <div class="service-card__body">
+                        <h3 class="service-card__name">Acabamento de Precisão</h3>
+                        <div class="service-card__meta">
+                            <span class="service-card__price">R$ 20</span>
+                            <span class="service-card__duration">15 min</span>
+                        </div>
+                        <p class="service-card__tagline">O detalhe que faz toda a diferença — contornos alinhados, resultado impecável.</p>
+                        <a class="service-card__cta" href="#agendar">Agendar <span class="arrow" aria-hidden="true">→</span></a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="services__cta-wrap reveal" style="transition-delay:.5s">
+                <a class="beam-btn" href="#agendar">
+                    <span class="beam-ring" aria-hidden="true"></span>
+                    <span class="beam-face">
+                        <span class="beam-sweep" aria-hidden="true"><span></span></span>
+                        <span class="beam-label">Agendar Horário <span class="arrow" aria-hidden="true">→</span></span>
+                    </span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================== DOBRA 4 — GALERIA ============================== -->
+    <section class="gallery" id="galeria">
+        <div class="gallery__inner">
+
+            <div class="gallery__header">
+                <div class="gallery__eyebrow reveal" style="transition-delay:.1s">
+                    <span class="num">04</span>
+                    <i class="rule" aria-hidden="true"></i>
+                    <span>Galeria</span>
+                </div>
+
+                <h2 class="gallery__title reveal" style="transition-delay:.2s">
+                    Dentro do <em>ritual.</em>
+                </h2>
+
+                <p class="gallery__subtitle reveal" style="transition-delay:.3s">
+                    Ambiente, ferramentas e o resultado que fala por si — um retrato
+                    de cada detalhe da Barbearia do Lirão.
+                </p>
+            </div>
+
+            <div class="gallery__grid">
+                <div class="gallery__item gallery__item--feature reveal" style="transition-delay:.1s">
+                    <img class="gallery__img" src="assets/img/hero-ambiente.jpg" alt="Ambiente clássico da Barbearia do Lirão: poltrona de couro e espelho com iluminação quente" loading="lazy" />
+                    <div class="gallery__tint" aria-hidden="true"></div>
+                    <div class="gallery__caption"><i class="rule" aria-hidden="true"></i>Ambiente</div>
+                </div>
+
+                <div class="gallery__item gallery__item--tall reveal" style="transition-delay:.2s">
+                    <img class="gallery__img" src="assets/img/service-acabamento.jpg" alt="Detalhe da tesoura finalizando o corte" loading="lazy" style="object-position: 65% 50%;" />
+                    <div class="gallery__tint" aria-hidden="true"></div>
+                    <div class="gallery__caption"><i class="rule" aria-hidden="true"></i>Ferramentas</div>
+                </div>
+
+                <div class="gallery__item reveal" style="transition-delay:.3s">
+                    <img class="gallery__img" src="assets/img/service-corte-classico.jpg" alt="Cadeira de barbearia clássica em tom sépia" loading="lazy" style="object-position: 70% 30%;" />
+                    <div class="gallery__tint" aria-hidden="true"></div>
+                    <div class="gallery__caption"><i class="rule" aria-hidden="true"></i>Tradição</div>
+                </div>
+
+                <div class="gallery__item reveal" style="transition-delay:.4s">
+                    <img class="gallery__img" src="assets/img/service-combo.jpg" alt="Interior retrô da barbearia com poltronas vintage" loading="lazy" />
+                    <div class="gallery__tint" aria-hidden="true"></div>
+                    <div class="gallery__caption"><i class="rule" aria-hidden="true"></i>Atmosfera</div>
+                </div>
+
+                <div class="gallery__item gallery__item--wide reveal" style="transition-delay:.5s">
+                    <img class="gallery__img" src="assets/img/service-shave.jpg" alt="Momento de shave clássico com navalha e espuma" loading="lazy" style="object-position: 30% 40%;" />
+                    <div class="gallery__tint" aria-hidden="true"></div>
+                    <div class="gallery__caption"><i class="rule" aria-hidden="true"></i>O Ritual</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================== DOBRA 5 — BARBEIROS ============================== -->
+    <section class="team" id="barbeiros">
+        <div class="team__inner">
+
+            <div class="team__header">
+                <div class="team__eyebrow reveal" style="transition-delay:.1s">
+                    <span class="num">05</span>
+                    <i class="rule" aria-hidden="true"></i>
+                    <span>Barbeiros</span>
+                </div>
+
+                <h2 class="team__title reveal" style="transition-delay:.2s">
+                    Mão experiente, <em>ofício vivo.</em>
+                </h2>
+
+                <p class="team__subtitle reveal" style="transition-delay:.3s">
+                    Por trás de cada corte, décadas de prática somadas — cada barbeiro
+                    com sua assinatura, todos com o mesmo padrão de excelência.
+                </p>
+            </div>
+
+            <div class="team__grid">
+                <div class="barber-card reveal" style="transition-delay:.1s">
+                    <div class="barber-card__portrait">
+                        <img class="barber-card__photo" src="assets/img/barber-andrade.jpg" alt="Retrato de &quot;Lirão&quot; Andrade" loading="lazy" style="object-position: 50% 25%;" />
+                        <div class="barber-card__photo-tint" aria-hidden="true"></div>
+                        <span class="barber-card__index">01</span>
+                    </div>
+                    <div class="barber-card__body">
+                        <h3 class="barber-card__name">"Lirão" Andrade</h3>
+                        <span class="barber-card__role">Fundador · Cortes Clássicos</span>
+                        <p class="barber-card__quote">"Vinte anos de tesoura na mão — e ainda aprendo algo novo em cada corte."</p>
+                    </div>
+                </div>
+
+                <div class="barber-card reveal" style="transition-delay:.2s">
+                    <div class="barber-card__portrait">
+                        <img class="barber-card__photo" src="assets/img/barber-amaral.webp" alt="Retrato de Diego Amaral" loading="lazy" style="object-position: 50% 20%;" />
+                        <div class="barber-card__photo-tint" aria-hidden="true"></div>
+                        <span class="barber-card__index">02</span>
+                    </div>
+                    <div class="barber-card__body">
+                        <h3 class="barber-card__name">Diego Amaral</h3>
+                        <span class="barber-card__role">Barba &amp; Navalha</span>
+                        <p class="barber-card__quote">"Barba boa é como vinho: exige tempo, técnica e paciência."</p>
+                    </div>
+                </div>
+
+                <div class="barber-card reveal" style="transition-delay:.3s">
+                    <div class="barber-card__portrait">
+                        <img class="barber-card__photo" src="assets/img/barber-castro.jpg" alt="Retrato de Bruno Castro" loading="lazy" style="object-position: 50% 15%;" />
+                        <div class="barber-card__photo-tint" aria-hidden="true"></div>
+                        <span class="barber-card__index">03</span>
+                    </div>
+                    <div class="barber-card__body">
+                        <h3 class="barber-card__name">Bruno Castro</h3>
+                        <span class="barber-card__role">Fade &amp; Estilo Contemporâneo</span>
+                        <p class="barber-card__quote">"Tradição e ousadia não competem — se completam."</p>
+                    </div>
+                </div>
+
+                <div class="barber-card reveal" style="transition-delay:.4s">
+                    <div class="barber-card__portrait">
+                        <img class="barber-card__photo" src="assets/img/barber-teles.jpg" alt="Retrato de Marcos Teles" loading="lazy" style="object-position: 50% 20%;" />
+                        <div class="barber-card__photo-tint" aria-hidden="true"></div>
+                        <span class="barber-card__index">04</span>
+                    </div>
+                    <div class="barber-card__body">
+                        <h3 class="barber-card__name">Marcos Teles</h3>
+                        <span class="barber-card__role">Acabamento &amp; Precisão</span>
+                        <p class="barber-card__quote">"O detalhe é onde a experiência aparece."</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================== DOBRA 6 — AVALIAÇÕES ============================== -->
+    <section class="reviews" id="avaliacoes">
+        <div class="reviews__inner">
+
+            <div class="reviews__header">
+                <div class="reviews__eyebrow reveal" style="transition-delay:.1s">
+                    <span class="num">06</span>
+                    <i class="rule" aria-hidden="true"></i>
+                    <span>Avaliações</span>
+                </div>
+
+                <h2 class="reviews__title reveal" style="transition-delay:.2s">
+                    Confiança que se <em>conquista.</em>
+                </h2>
+
+                <p class="reviews__subtitle reveal" style="transition-delay:.3s">
+                    A prova está em quem já sentou na cadeira — e voltou.
+                </p>
+            </div>
+
+            <div class="reviews__rating reveal" style="transition-delay:.35s">
+                <span class="reviews__stars" aria-hidden="true">★★★★★</span>
+                <span class="reviews__score">4.9/5</span>
+                <span class="reviews__dot" aria-hidden="true">•</span>
+                <span class="reviews__count">+300 avaliações no Google</span>
+            </div>
+
+            <!-- Depoimento em destaque — pull-quote editorial -->
+            <div class="reviews__featured reveal" style="transition-delay:.4s">
+                <span class="reviews__quote-mark" aria-hidden="true">"</span>
+                <p class="reviews__featured-text">Não é só corte de cabelo, é ritual. Saio sempre com a autoestima lá em cima.</p>
+                <div class="reviews__featured-author">
+                    <span class="reviews__featured-name">Marcelo Rocha</span>
+                    <span class="reviews__featured-meta">Cliente desde 2020</span>
+                    <span class="reviews__featured-stars" aria-hidden="true">★★★★★</span>
+                </div>
+            </div>
+
+            <!-- Depoimentos secundários -->
+            <div class="reviews__grid">
+                <div class="review-card reveal" style="transition-delay:.1s">
+                    <span class="review-card__stars" aria-hidden="true">★★★★★</span>
+                    <p class="review-card__text">"Melhor barba que já fiz na vida. Navalha, toalha quente, tudo no tempo certo."</p>
+                    <div>
+                        <div class="review-card__name">Thiago Nunes</div>
+                        <div class="review-card__role">Cliente frequente</div>
+                    </div>
+                </div>
+
+                <div class="review-card reveal" style="transition-delay:.2s">
+                    <span class="review-card__stars" aria-hidden="true">★★★★★</span>
+                    <p class="review-card__text">"Ambiente clássico, atendimento atencioso e um corte que dura semanas. Virei cliente fixo."</p>
+                    <div>
+                        <div class="review-card__name">Rafael Mendes</div>
+                        <div class="review-card__role">Cliente desde 2022</div>
+                    </div>
+                </div>
+
+                <div class="review-card reveal" style="transition-delay:.3s">
+                    <span class="review-card__stars" aria-hidden="true">★★★★★</span>
+                    <p class="review-card__text">"Cada detalhe pensado — da recepção ao acabamento. Dá pra sentir a experiência de quem manja do ofício."</p>
+                    <div>
+                        <div class="review-card__name">Eduardo Santos</div>
+                        <div class="review-card__role">Cliente desde 2019</div>
+                    </div>
+                </div>
+
+                <div class="review-card reveal" style="transition-delay:.4s">
+                    <span class="review-card__stars" aria-hidden="true">★★★★★</span>
+                    <p class="review-card__text">"Levei meu pai e meu filho no mesmo dia. Três gerações, um só padrão de qualidade."</p>
+                    <div>
+                        <div class="review-card__name">Gustavo Lima</div>
+                        <div class="review-card__role">Cliente em família</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================== DOBRA 7 — AGENDAR / CONTATO ============================== -->
+    <section class="contact" id="agendar">
+        <div class="contact__inner">
+
+            <!-- CTA principal — elemento dominante da seção -->
+            <div class="contact__cta">
+                <div class="contact__eyebrow reveal" style="transition-delay:.1s">
+                    <span class="num">07</span>
+                    <i class="rule" aria-hidden="true"></i>
+                    <span>Agende Seu Horário</span>
+                </div>
+
+                <h2 class="contact__title reveal" style="transition-delay:.2s">
+                    Sua cadeira <em>espera.</em>
+                </h2>
+
+                <p class="contact__subtitle reveal" style="transition-delay:.3s">
+                    Agendamento rápido, direto pelo WhatsApp — sem complicação.
+                </p>
+
+                <div class="contact__actions reveal" style="transition-delay:.4s">
+                    <a class="beam-btn" href="https://wa.me/5511987654321?text=Ol%C3%A1!%20Quero%20agendar%20um%20hor%C3%A1rio%20na%20Barbearia%20do%20Lir%C3%A3o." target="_blank" rel="noopener">
+                        <span class="beam-ring" aria-hidden="true"></span>
+                        <span class="beam-face">
+                            <span class="beam-sweep" aria-hidden="true"><span></span></span>
+                            <span class="beam-label">Agendar pelo WhatsApp <span class="arrow" aria-hidden="true">→</span></span>
+                        </span>
+                    </a>
+                    <a class="contact__phone-link" href="tel:+5511987654321">ou ligue: (11) 98765-4321</a>
+                </div>
+            </div>
+
+            <!-- Dados objetivos — fácil de escanear -->
+            <div class="contact__details">
+                <div class="contact__detail reveal" style="transition-delay:.1s">
+                    <span class="contact__detail-label">Endereço</span>
+                    <p class="contact__detail-value">Rua dos Barbeiros, 128<br />Vila Madalena — São Paulo, SP</p>
+                </div>
+
+                <div class="contact__detail reveal" style="transition-delay:.2s">
+                    <span class="contact__detail-label">Horário</span>
+                    <p class="contact__detail-value">Terça a Sábado<br />9h às 20h</p>
+                </div>
+
+                <div class="contact__detail reveal" style="transition-delay:.3s">
+                    <span class="contact__detail-label">Telefone</span>
+                    <p class="contact__detail-value"><a href="tel:+5511987654321">(11) 98765-4321</a></p>
+                </div>
+
+                <div class="contact__detail reveal" style="transition-delay:.4s">
+                    <span class="contact__detail-label">Instagram</span>
+                    <p class="contact__detail-value"><a href="https://instagram.com/barbeariadolirao" target="_blank" rel="noopener">@barbeariadolirao</a></p>
+                </div>
+            </div>
+
+            <!-- Bloco de localização estilizado -->
+            <div class="contact__map reveal" style="transition-delay:.5s">
+                <div class="contact__map-grid" aria-hidden="true"></div>
+                <span class="contact__pin" aria-hidden="true"></span>
+                <span class="contact__map-address">Rua dos Barbeiros, 128</span>
+                <span class="contact__map-caption">Vila Madalena — São Paulo, SP</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================== FOOTER ============================== -->
+    <footer class="site-footer">
+        <div class="site-footer__inner">
+            <div class="site-footer__top">
+                <div class="site-footer__brand">
+                    <a class="site-footer__logo" href="#hero">Barbearia <em>do Lirão</em></a>
+                    <p class="site-footer__tagline">Ofício clássico, cuidado atual — uma barbearia para durar gerações.</p>
+                </div>
+
+                <div class="site-footer__col">
+                    <span class="site-footer__col-title">Navegação</span>
+                    <ul class="site-footer__links">
+                        <li><a href="#historia">Nossa História</a></li>
+                        <li><a href="#servicos">Serviços</a></li>
+                        <li><a href="#galeria">Galeria</a></li>
+                        <li><a href="#barbeiros">Barbeiros</a></li>
+                        <li><a href="#avaliacoes">Avaliações</a></li>
+                        <li><a href="#agendar">Agendar</a></li>
+                    </ul>
+                </div>
+
+                <div class="site-footer__col">
+                    <span class="site-footer__col-title">Contato</span>
+                    <ul class="site-footer__links">
+                        <li>Rua dos Barbeiros, 128<br />Vila Madalena — São Paulo, SP</li>
+                        <li><a href="tel:+5511987654321">(11) 98765-4321</a></li>
+                        <li><a href="https://instagram.com/barbeariadolirao" target="_blank" rel="noopener">@barbeariadolirao</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="site-footer__bottom">
+                <span class="site-footer__copy">© 2026 Barbearia do Lirão. Todos os direitos reservados.</span>
+                <a class="site-footer__top-link" href="#hero">Voltar ao topo <span aria-hidden="true">↑</span></a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="assets/js/main.js"></script>
+</body>
+
+</html>
